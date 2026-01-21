@@ -26,21 +26,46 @@ export class SupabaseService {
   }
 
   /**
-   * Select from a table
+   * Select from a table with optional pagination and sorting
    */
-  async select(table: string, columns = '*', filters?: Record<string, any>) {
-    let query: any = this.supabase.from(table).select(columns);
+  async select(
+    table: string,
+    columns = '*',
+    filters?: Record<string, any>,
+    isCount: boolean = false,
+    sortBy?: string,
+    sortDirection: 'asc' | 'desc' = 'asc',
+    limit?: number,
+    offset?: number
+  ) {
+    let query: any = this.supabase.from(table).select(columns, { count: isCount ? 'exact' : undefined });
 
-    if (filters) {
+    if (filters && Object.keys(filters).length > 0) {
       for (const [key, value] of Object.entries(filters)) {
         query = query.eq(key, value);
       }
     }
 
-    const { data, error } = await query;
+    if (sortBy) {
+      query = query.order(sortBy, { ascending: sortDirection === 'asc' });
+    }
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    if (offset !== undefined) {
+      query = query.range(offset, offset + (limit || 10) - 1);
+    }
+
+    const { data, error, count } = await query;
 
     if (error) {
       throw new Error(`Supabase select error: ${error.message}`);
+    }
+
+    if (isCount) {
+      return [{ count }];
     }
 
     return data;

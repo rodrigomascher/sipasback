@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import { CreateRelationshipDegreeDto } from './dto/create-relationship-degree.dto';
 import { UpdateRelationshipDegreeDto } from './dto/update-relationship-degree.dto';
+import { PaginatedResponseDto, PaginationQueryDto } from '../common/dto/paginated-response.dto';
 
 @Injectable()
 export class RelationshipDegreesService {
@@ -33,12 +34,28 @@ export class RelationshipDegreesService {
     return result?.[0] ? this.toCamelCase(result[0]) : null;
   }
 
-  async findAll() {
+  async findAll(paginationQuery: PaginationQueryDto): Promise<PaginatedResponseDto<any>> {
+    const columns = 'id, description, active, created_by, updated_by, created_at, updated_at';
+    
+    // Get total count
+    const countResult = await this.supabaseService.select('relationship_degree', 'count(*)', {}, true);
+    const total = countResult?.[0]?.count || 0;
+
+    // Get paginated data
+    const offset = paginationQuery.getOffset();
     const result = await this.supabaseService.select(
       'relationship_degree',
-      'id, description, active, created_by, updated_by, created_at, updated_at'
+      columns,
+      {},
+      false,
+      paginationQuery.sortBy,
+      paginationQuery.sortDirection,
+      paginationQuery.pageSize,
+      offset
     );
-    return result?.map(item => this.toCamelCase(item)) || [];
+
+    const data = result?.map(item => this.toCamelCase(item)) || [];
+    return new PaginatedResponseDto(data, total, paginationQuery.page, paginationQuery.pageSize);
   }
 
   async findOne(id: number) {

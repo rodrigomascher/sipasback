@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import { CreateFamilyCompositionDto, UpdateFamilyCompositionDto, FamilyCompositionDto } from './dto/family-composition.dto';
+import { PaginatedResponseDto, PaginationQueryDto } from '../common/dto/paginated-response.dto';
 
 @Injectable()
 export class FamilyCompositionService {
@@ -56,12 +57,28 @@ export class FamilyCompositionService {
     return result?.[0] ? this.toCamelCase(result[0]) : null;
   }
 
-  async findAll(): Promise<FamilyCompositionDto[]> {
+  async findAll(paginationQuery: PaginationQueryDto): Promise<PaginatedResponseDto<any>> {
+    const columns = 'id_family_composition, id_person, id_relationship_degree, responsible, registration_date, created_by, created_at, updated_by, updated_at';
+    
+    // Get total count
+    const countResult = await this.supabaseService.select('family_composition', 'count(*)', {}, true);
+    const total = countResult?.[0]?.count || 0;
+
+    // Get paginated data
+    const offset = paginationQuery.getOffset();
     const result = await this.supabaseService.select(
       'family_composition',
-      'id_family_composition, id_person, id_relationship_degree, responsible, registration_date, created_by, created_at, updated_by, updated_at'
+      columns,
+      {},
+      false,
+      paginationQuery.sortBy,
+      paginationQuery.sortDirection,
+      paginationQuery.pageSize,
+      offset
     );
-    return result?.map(item => this.toCamelCase(item)) || [];
+
+    const data = result?.map(item => this.toCamelCase(item)) || [];
+    return new PaginatedResponseDto(data, total, paginationQuery.page, paginationQuery.pageSize);
   }
 
   async findByFamily(idFamilyComposition: number): Promise<FamilyCompositionDto[]> {
