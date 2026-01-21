@@ -20,11 +20,15 @@ CREATE TABLE IF NOT EXISTS public.units (
   is_armored BOOLEAN DEFAULT FALSE,
   city VARCHAR(100) NOT NULL,
   state VARCHAR(2) NOT NULL,
+  created_by BIGINT REFERENCES public.users(id) ON DELETE SET NULL,
+  updated_by BIGINT REFERENCES public.users(id) ON DELETE SET NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE INDEX idx_units_city_state ON public.units(city, state);
+CREATE INDEX idx_units_created_by ON public.units(created_by);
+CREATE INDEX idx_units_updated_by ON public.units(updated_by);
 
 -- ============================================
 -- 2. DEPARTMENTS TABLE (Secretarias)
