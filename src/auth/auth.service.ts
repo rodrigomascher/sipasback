@@ -8,10 +8,10 @@ export interface UserSession {
   email: string;
   name: string;
   employeeId?: number | null;
-  unitId: number;
+  unitId: number | null;
   unitName: string;
   unitType: string;
-  departmentId: number;
+  departmentId: number | null;
   departmentName: string;
   roleId?: number | null;
   roleName: string;
@@ -79,10 +79,10 @@ export class AuthService {
    */
   async validateUser(email: string, password: string): Promise<UserSession | null> {
     try {
-      // Query user from Supabase
+      // Query user from Supabase (without unit_id, department_id, role_id - now in junction tables)
       const users = await this.supabaseService.select(
         'users',
-        'id, email, name, password_hash, employee_id, unit_id, department_id, role_id, last_login, is_active',
+        'id, email, name, password_hash, employee_id, last_login, is_active',
         { email },
       );
 
@@ -101,24 +101,70 @@ export class AuthService {
         return null;
       }
 
-      // Fetch related data separately
-      let unitData = { name: 'Unknown Unit', type: 'Unknown', is_armored: false, city: 'Unknown', state: 'Unknown' };
-      let departmentData = { name: 'Unknown Department' };
-      let roleData = { name: 'User', is_technician: false };
-
-      if (user.unit_id) {
-        const units = await this.supabaseService.select('units', '*', { id: user.unit_id });
-        if (units.length > 0) unitData = units[0];
+      // Fetch user's units from junction table
+      let userUnits: any[] = [];
+      try {
+        userUnits = await this.supabaseService.select(
+          'user_units',
+          'unit_id',
+          { user_id: user.id }
+        );
+      } catch (err) {
+        console.warn('[AUTH] Could not fetch user units:', err.message);
       }
 
-      if (user.department_id) {
-        const depts = await this.supabaseService.select('departments', '*', { id: user.department_id });
-        if (depts.length > 0) departmentData = depts[0];
+      // Get first unit's data if available
+      let unitData: any = { id: null, name: 'Unknown Unit', type: 'Unknown', is_armored: false, city: 'Unknown', state: 'Unknown' };
+      if (userUnits && userUnits.length > 0) {
+        const firstUnit = userUnits[0] as any;
+        if (firstUnit.unit_id) {
+          const units = await this.supabaseService.select('units', '*', { id: firstUnit.unit_id });
+          if (units && units.length > 0) {
+            unitData = units[0];
+          }
+        }
       }
 
-      if (user.role_id) {
-        const roles = await this.supabaseService.select('roles', '*', { id: user.role_id });
-        if (roles.length > 0) roleData = roles[0];
+      // Fetch user's departments from junction table
+      let userDepartments: any[] = [];
+      try {
+        userDepartments = await this.supabaseService.select(
+          'user_departments',
+          'department_id',
+          { user_id: user.id }
+        );
+      } catch (err) {
+        console.warn('[AUTH] Could not fetch user departments:', err.message);
+      }
+
+      let departmentData: any = { id: null, name: 'Unknown Department' };
+      if (userDepartments && userDepartments.length > 0) {
+        const firstDept = userDepartments[0] as any;
+        if (firstDept.department_id) {
+          const depts = await this.supabaseService.select('departments', '*', { id: firstDept.department_id });
+          if (depts && depts.length > 0) departmentData = depts[0];
+        }
+      }
+
+      // Fetch user's roles from junction table
+      let userRoles: any[] = [];
+      try {
+        userRoles = await this.supabaseService.select(
+          'user_roles',
+          'role_id',
+          { user_id: user.id }
+        );
+      } catch (err) {
+        console.warn('[AUTH] Could not fetch user roles:', err.message);
+      }
+
+      let roleData: any = { id: null, name: 'User', is_technician: false };
+      if (userRoles && userRoles.length > 0) {
+        const firstRole = userRoles[0] as any;
+        if (firstRole.role_id) {
+          const roles = await this.supabaseService.select('roles', '*', { id: firstRole.role_id });
+          if (roles && roles.length > 0) roleData = roles[0];
+        }
       }
 
       // Update last login
@@ -134,17 +180,17 @@ export class AuthService {
         email: user.email,
         name: user.name,
         employeeId: user.employee_id || null,
-        unitId: user.unit_id,
-        unitName: unitData.name,
-        unitType: unitData.type,
-        departmentId: user.department_id,
-        departmentName: departmentData.name,
-        roleId: user.role_id || null,
-        roleName: roleData.name,
-        isTechnician: roleData.is_technician || false,
-        isArmoredUnit: unitData.is_armored || false,
-        city: unitData.city,
-        state: unitData.state,
+        unitId: unitData?.id || null,
+        unitName: unitData?.name || 'Unknown Unit',
+        unitType: unitData?.type || 'Unknown',
+        departmentId: departmentData?.id || null,
+        departmentName: departmentData?.name || 'Unknown Department',
+        roleId: roleData?.id || null,
+        roleName: roleData?.name || 'User',
+        isTechnician: roleData?.is_technician || false,
+        isArmoredUnit: unitData?.is_armored || false,
+        city: unitData?.city || 'Unknown',
+        state: unitData?.state || 'Unknown',
       };
     } catch (error) {
       console.error('[AUTH] Error validating user:', error);

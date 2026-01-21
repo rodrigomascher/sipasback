@@ -55,8 +55,7 @@ export class UsersService {
       email,
       name,
       password_hash: '', // Will be set by auth service
-      unit_id: 1, // Default unit
-      department_id: 1, // Default department
+      // unit_id, department_id, role_id removed - now in junction tables
     });
     const user = users[0];
     return {

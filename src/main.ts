@@ -9,6 +9,19 @@ dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Configuração de CORS
+  app.enableCors({
+    origin: [
+      'http://localhost:4200',      // Development
+      'http://localhost:3000',      // Alternative dev
+      'http://127.0.0.1:4200',
+      process.env.FRONTEND_URL      // From environment
+    ].filter(Boolean),
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  });
+
   // Configuração do Swagger
   const config = new DocumentBuilder()
     .setTitle('SIPAS API')

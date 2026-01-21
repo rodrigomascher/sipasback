@@ -85,13 +85,13 @@ export class SupabaseService {
    * Delete from a table
    */
   async delete(table: string, filters: Record<string, any>) {
-    let query: any = this.supabase.from(table);
+    let query: any = this.supabase.from(table).delete();
 
     for (const [key, value] of Object.entries(filters)) {
       query = query.eq(key, value);
     }
 
-    const { error } = await query.delete();
+    const { error } = await query;
 
     if (error) {
       throw new Error(`Supabase delete error: ${error.message}`);
