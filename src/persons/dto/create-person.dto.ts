@@ -27,7 +27,7 @@ export class CreatePersonDto {
 
   @IsOptional()
   @IsString()
-  nickname?: string;
+  socialName?: string;
 
   @IsOptional()
   @IsNumber()
@@ -81,14 +81,6 @@ export class CreatePersonDto {
   @IsOptional()
   @IsNumber()
   fatherPersonId?: number;
-
-  @IsOptional()
-  @IsString()
-  motherRg?: string;
-
-  @IsOptional()
-  @IsString()
-  fatherRg?: string;
 
   @IsOptional()
   @IsNumber()

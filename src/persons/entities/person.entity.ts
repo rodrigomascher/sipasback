@@ -14,7 +14,7 @@ export class Person {
   firstName: string;
   lastName: string;
   fullName?: string;
-  nickname?: string;
+  socialName?: string;
   birthDate: Date;
   sex?: number; // 1=M, 2=F
   genderId?: number;
@@ -31,8 +31,6 @@ export class Person {
   // Filial Data (Parents) - can link to another person
   motherPersonId?: number;
   fatherPersonId?: number;
-  motherRg?: string;
-  fatherRg?: string;
   motherResidenceOrder?: number;
   fatherResidenceOrder?: number;
 

@@ -8,6 +8,9 @@ import { DepartmentsModule } from './departments/departments.module';
 import { RolesModule } from './roles/roles.module';
 import { EmployeesModule } from './employees/employees.module';
 import { PersonsModule } from './persons/persons.module';
+import { GendersModule } from './genders/genders.module';
+import { GenderIdentitiesModule } from './gender-identities/gender-identities.module';
+import { SexualOrientationsModule } from './sexual-orientations/sexual-orientations.module';
 import { ExampleModule } from './example/example.module';
 import { LoggerModule } from './common/logger/logger.module';
 
@@ -20,6 +23,9 @@ import { LoggerModule } from './common/logger/logger.module';
     RolesModule,
     EmployeesModule,
     PersonsModule,
+    GendersModule,
+    GenderIdentitiesModule,
+    SexualOrientationsModule,
     ExampleModule,
     LoggerModule,
   ],
