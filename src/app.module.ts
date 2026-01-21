@@ -7,6 +7,7 @@ import { UnitsModule } from './units/units.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { RolesModule } from './roles/roles.module';
 import { EmployeesModule } from './employees/employees.module';
+import { PersonsModule } from './persons/persons.module';
 import { ExampleModule } from './example/example.module';
 import { LoggerModule } from './common/logger/logger.module';
 
@@ -18,6 +19,7 @@ import { LoggerModule } from './common/logger/logger.module';
     DepartmentsModule,
     RolesModule,
     EmployeesModule,
+    PersonsModule,
     ExampleModule,
     LoggerModule,
   ],
