@@ -23,13 +23,13 @@ export class EmployeesService {
     paginationQuery: PaginationQueryDto,
   ): Promise<PaginatedResponseDto<any>> {
     const columns =
-      'id, name, email, active, created_by, updated_by, created_at, updated_at';
+      'id, employee_id, full_name, unit_id, department_id, role_id, is_technician, created_by, updated_by, created_at, updated_at';
     const offset = paginationQuery.getOffset();
 
     // Get paginated data with count
     const { data, count } =
       await this.supabaseService.selectWithCount<Employee>(
-        'employee',
+        'employees',
         columns,
         {},
         paginationQuery.sortBy,
@@ -74,7 +74,7 @@ export class EmployeesService {
       { unit_id: unitId },
     );
 
-    return (employees || []).map(this.mapToEmployeeDto);
+    return (employees || []).map((emp) => this.mapToEmployeeDto(emp));
   }
 
   /**
@@ -87,7 +87,7 @@ export class EmployeesService {
       { department_id: departmentId },
     );
 
-    return (employees || []).map(this.mapToEmployeeDto);
+    return (employees || []).map((emp) => this.mapToEmployeeDto(emp));
   }
 
   /**
@@ -100,7 +100,7 @@ export class EmployeesService {
       { role_id: roleId },
     );
 
-    return (employees || []).map(this.mapToEmployeeDto);
+    return (employees || []).map((emp) => this.mapToEmployeeDto(emp));
   }
 
   /**
@@ -144,7 +144,7 @@ export class EmployeesService {
     // First verify employee exists
     await this.findOne(id);
 
-    const data: any = {};
+    const data: Partial<Employee> = {};
     if (updateEmployeeDto.employeeId)
       data.employee_id = updateEmployeeDto.employeeId;
     if (updateEmployeeDto.fullName) data.full_name = updateEmployeeDto.fullName;
@@ -191,12 +191,12 @@ export class EmployeesService {
   private mapToEmployeeDto(employee: Employee): EmployeeDto {
     return {
       id: employee.id,
-      employeeId: employee.person_id.toString(),
-      fullName: '',
-      unitId: employee.department_id,
-      departmentId: employee.department_id,
-      roleId: employee.person_id || null,
-      isTechnician: false,
+      employeeId: employee.employee_id ? String(employee.employee_id) : '',
+      fullName: employee.full_name || '',
+      unitId: employee.unit_id || 0,
+      departmentId: employee.department_id || 0,
+      roleId: employee.role_id || null,
+      isTechnician: employee.is_technician || false,
       createdBy: employee.created_by || null,
       updatedBy: employee.updated_by || null,
       createdAt: employee.created_at,

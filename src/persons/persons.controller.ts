@@ -7,23 +7,38 @@ import {
   Body,
   Param,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { PersonsService } from './persons.service';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { Person } from './entities/person.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { PaginationQueryDto } from '../common/dto/paginated-response.dto';
 
 @Controller('api/persons')
 export class PersonsController {
   constructor(private personsService: PersonsService) {}
 
   /**
-   * Get all persons (with optional search)
-   * GET /api/persons?search=name
+   * Get all persons (with pagination and sorting)
+   * GET /api/persons?page=1&pageSize=10&sortBy=fullName&sortDirection=asc
    */
   @Get()
-  async findAll(@Query('search') search?: string): Promise<Person[]> {
-    return this.personsService.findAll(search);
+  @UseGuards(JwtAuthGuard)
+  async findAll(
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortDirection') sortDirection?: string,
+  ) {
+    const paginationQuery = new PaginationQueryDto({
+      page: page ? parseInt(page, 10) : 1,
+      pageSize: pageSize ? parseInt(pageSize, 10) : 10,
+      sortBy,
+      sortDirection: sortDirection as 'asc' | 'desc' | undefined,
+    });
+    return this.personsService.findAll(paginationQuery);
   }
 
   /**

@@ -1,6 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import { CreateUnitDto, UpdateUnitDto, UnitDto } from './dto/unit.dto';
+import {
+  PaginatedResponseDto,
+  PaginationQueryDto,
+} from '../common/dto/paginated-response.dto';
+import { toCamelCase } from '../common/utils/transform.utils';
 import { Unit } from '../common/types/database.types';
 
 @Injectable()
@@ -8,15 +13,33 @@ export class UnitsService {
   constructor(private supabaseService: SupabaseService) {}
 
   /**
-   * Get all units
+   * Get all units with pagination
    */
-  async findAll(): Promise<UnitDto[]> {
-    const units = await this.supabaseService.select<Unit>(
+  async findAll(
+    paginationQuery: PaginationQueryDto,
+  ): Promise<PaginatedResponseDto<any>> {
+    const columns =
+      'id, name, type, is_armored, city, state, created_by, updated_by, created_at, updated_at';
+    const offset = paginationQuery.getOffset();
+
+    // Get paginated data with count
+    const { data, count } = await this.supabaseService.selectWithCount<Unit>(
       'units',
-      'id, name, type, is_armored, city, state, created_by, updated_by, created_at, updated_at',
+      columns,
+      {},
+      paginationQuery.sortBy,
+      paginationQuery.sortDirection,
+      paginationQuery.pageSize,
+      offset,
     );
 
-    return (units || []).map(this.mapToUnitDto);
+    const mappedData = data?.map((item) => toCamelCase(item)) || [];
+    return new PaginatedResponseDto(
+      mappedData,
+      count || 0,
+      paginationQuery.page,
+      paginationQuery.pageSize,
+    );
   }
 
   /**
@@ -46,7 +69,7 @@ export class UnitsService {
       { city },
     );
 
-    return (units || []).map(this.mapToUnitDto);
+    return (units || []).map((unit) => this.mapToUnitDto(unit));
   }
 
   /**
@@ -59,7 +82,7 @@ export class UnitsService {
       { state },
     );
 
-    return (units || []).map(this.mapToUnitDto);
+    return (units || []).map((unit) => this.mapToUnitDto(unit));
   }
 
   /**
@@ -144,10 +167,10 @@ export class UnitsService {
     return {
       id: unit.id,
       name: unit.name,
-      type: unit.created_by.toString(),
-      isArmored: false,
-      city: '',
-      state: '',
+      type: (unit as any).type || '',
+      isArmored: (unit as any).is_armored || false,
+      city: (unit as any).city || '',
+      state: (unit as any).state || '',
       createdBy: unit.created_by || null,
       updatedBy: unit.updated_by || null,
       createdAt: unit.created_at,

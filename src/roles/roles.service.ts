@@ -19,12 +19,12 @@ export class RolesService {
     paginationQuery: PaginationQueryDto,
   ): Promise<PaginatedResponseDto<any>> {
     const columns =
-      'id, name, description, active, created_by, updated_by, created_at, updated_at';
+      'id, name, description, is_technician, created_by, updated_by, created_at, updated_at';
     const offset = paginationQuery.getOffset();
 
     // Get paginated data with count
     const { data, count } = await this.supabaseService.selectWithCount<Role>(
-      'role',
+      'roles',
       columns,
       {},
       paginationQuery.sortBy,
@@ -147,7 +147,7 @@ export class RolesService {
       id: role.id,
       name: role.name,
       description: role.description || null,
-      isTechnician: false,
+      isTechnician: (role as any).is_technician || false,
       createdBy: role.created_by || null,
       updatedBy: role.updated_by || null,
       createdAt: role.created_at,

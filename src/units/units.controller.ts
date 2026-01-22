@@ -21,6 +21,7 @@ import { UnitsService } from './units.service';
 import { CreateUnitDto, UpdateUnitDto, UnitDto } from './dto/unit.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../common/decorators/get-user.decorator';
+import { PaginationQueryDto } from '../common/dto/paginated-response.dto';
 import type { UserSession } from '../auth/auth.service';
 
 @ApiTags('units')
@@ -35,14 +36,24 @@ export class UnitsController {
   @ApiResponse({
     status: 200,
     description: 'List of units',
-    type: [UnitDto],
   })
   @ApiResponse({
     status: 401,
     description: 'Unauthorized',
   })
-  async findAll() {
-    return this.unitsService.findAll();
+  async findAll(
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortDirection') sortDirection?: string,
+  ) {
+    const paginationQuery = new PaginationQueryDto({
+      page: page ? parseInt(page, 10) : 1,
+      pageSize: pageSize ? parseInt(pageSize, 10) : 10,
+      sortBy,
+      sortDirection: sortDirection as 'asc' | 'desc' | undefined,
+    });
+    return this.unitsService.findAll(paginationQuery);
   }
 
   @Get('search/city/:city')

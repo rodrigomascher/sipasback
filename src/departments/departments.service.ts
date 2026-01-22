@@ -23,13 +23,13 @@ export class DepartmentsService {
     paginationQuery: PaginationQueryDto,
   ): Promise<PaginatedResponseDto<any>> {
     const columns =
-      'id, name, active, created_by, updated_by, created_at, updated_at';
+      'id, name, unit_id, created_by, updated_by, created_at, updated_at';
     const offset = paginationQuery.getOffset();
 
     // Get paginated data with count
     const { data, count } =
       await this.supabaseService.selectWithCount<Department>(
-        'department',
+        'departments',
         columns,
         {},
         paginationQuery.sortBy,
@@ -74,7 +74,7 @@ export class DepartmentsService {
       { unit_id: unitId },
     );
 
-    return (departments || []).map(this.mapToDepartmentDto);
+    return (departments || []).map((dept) => this.mapToDepartmentDto(dept));
   }
 
   /**
@@ -114,7 +114,7 @@ export class DepartmentsService {
     // First verify department exists
     await this.findOne(id);
 
-    const data: any = {};
+    const data: Partial<Department> = {};
     if (updateDepartmentDto.name) data.name = updateDepartmentDto.name;
     if (updateDepartmentDto.unitId) data.unit_id = updateDepartmentDto.unitId;
     data.updated_by = userId;
@@ -156,7 +156,7 @@ export class DepartmentsService {
     return {
       id: department.id,
       name: department.name,
-      unitId: department.parent_id || 0,
+      unitId: department.unit_id || (department.parent_id || 0),
       createdBy: department.created_by || null,
       updatedBy: department.updated_by || null,
       createdAt: department.created_at,

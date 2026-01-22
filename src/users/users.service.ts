@@ -1,5 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
+import {
+  PaginatedResponseDto,
+  PaginationQueryDto,
+} from '../common/dto/paginated-response.dto';
+import { toCamelCase } from '../common/utils/transform.utils';
 import { User } from '../common/types/database.types';
 
 export interface UserDto {
@@ -13,17 +18,31 @@ export interface UserDto {
 export class UsersService {
   constructor(private supabaseService: SupabaseService) {}
 
-  async findAll(): Promise<UserDto[]> {
-    const users = await this.supabaseService.select<User>(
+  async findAll(
+    paginationQuery: PaginationQueryDto,
+  ): Promise<PaginatedResponseDto<any>> {
+    const columns =
+      'id, email, name, created_at';
+    const offset = paginationQuery.getOffset();
+
+    // Get paginated data with count
+    const { data, count } = await this.supabaseService.selectWithCount<User>(
       'users',
-      'id, email, name, created_at',
+      columns,
+      {},
+      paginationQuery.sortBy,
+      paginationQuery.sortDirection,
+      paginationQuery.pageSize,
+      offset,
     );
-    return users.map((user) => ({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      createdAt: new Date(user.created_at),
-    }));
+
+    const mappedData = data?.map((item) => toCamelCase(item)) || [];
+    return new PaginatedResponseDto(
+      mappedData,
+      count || 0,
+      paginationQuery.page,
+      paginationQuery.pageSize,
+    );
   }
 
   async findOne(id: number): Promise<UserDto | undefined> {

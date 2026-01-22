@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -17,6 +18,7 @@ import {
 import { UsersService } from './users.service';
 import { UserDto } from './dto/user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { PaginationQueryDto } from '../common/dto/paginated-response.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -30,10 +32,20 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'User list',
-    type: [UserDto],
   })
-  findAll() {
-    return this.usersService.findAll();
+  findAll(
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortDirection') sortDirection?: string,
+  ) {
+    const paginationQuery = new PaginationQueryDto({
+      page: page ? parseInt(page, 10) : 1,
+      pageSize: pageSize ? parseInt(pageSize, 10) : 10,
+      sortBy,
+      sortDirection: sortDirection as 'asc' | 'desc' | undefined,
+    });
+    return this.usersService.findAll(paginationQuery);
   }
 
   @Get(':id')

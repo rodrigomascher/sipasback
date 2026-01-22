@@ -29,18 +29,24 @@ export interface SexualOrientation extends BaseEntity {
 
 export interface Department extends BaseEntity {
   name: string;
-  description: string | null;
-  parent_id: number | null;
+  description?: string | null;
+  unit_id?: number | null;
+  parent_id?: number | null;
   created_by: number;
   updated_by: number | null;
 }
 
 export interface Employee extends BaseEntity {
-  person_id: number;
-  department_id: number;
-  start_date: string;
-  end_date: string | null;
-  position: string;
+  employee_id?: string;
+  full_name?: string;
+  person_id?: number | null;
+  unit_id?: number | null;
+  department_id?: number;
+  role_id?: number | null;
+  is_technician?: boolean;
+  start_date?: string;
+  end_date?: string | null;
+  position?: string;
   created_by: number;
   updated_by: number | null;
 }
@@ -54,6 +60,10 @@ export interface Role extends BaseEntity {
 
 export interface Unit extends BaseEntity {
   name: string;
+  type?: string;
+  is_armored?: boolean;
+  city?: string;
+  state?: string;
   created_by: number;
   updated_by: number | null;
 }
