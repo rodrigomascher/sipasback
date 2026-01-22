@@ -11,6 +11,7 @@ import {
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { SelectUnitDto } from './dto/select-unit.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { LoggerService } from '../common/logger/logger.service';
 
@@ -133,12 +134,8 @@ export class AuthController {
     status: 401,
     description: 'Unauthorized',
   })
-  async selectUnit(@Body() body: { unitId: number }, @Req() req: any) {
+  async selectUnit(@Body() selectUnitDto: SelectUnitDto, @Req() req: any) {
     try {
-      if (!body.unitId) {
-        throw new BadRequestException('Unit ID is required');
-      }
-
       // Obter usuário do JWT atual
       const authHeader = req.headers.authorization;
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -153,10 +150,10 @@ export class AuthController {
       }
 
       // Obter dados da unidade selecionada
-      const result = await this.authService.selectUnit(user, body.unitId);
+      const result = await this.authService.selectUnit(user, selectUnitDto.unitId);
 
       this.logger.logAudit(user.id, 'SELECT_UNIT', 'unit', {
-        unitId: body.unitId,
+        unitId: selectUnitDto.unitId,
       });
 
       return result;
