@@ -130,7 +130,7 @@ export class PersonsService {
 
     const data = this.dtoToData(updatePersonDto);
     data.updated_at = new Date();
-    data.updated_by = userId; // Automatically set from authenticated user
+    data.updated_by = userId; // Update audit timestamp and user, created_by remains unchanged
 
     const result = await this.supabaseService.update('person', data, { id });
     return this.mapPerson(result[0]);
