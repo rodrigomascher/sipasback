@@ -74,13 +74,17 @@ describe('GendersController', () => {
     it('should create a new gender', async () => {
       const createGenderDto: CreateGenderDto = { name: 'Outro' };
       const mockResult = { id: 3, name: 'Outro', created_at: new Date() };
+      const userId = 1;
 
       mockGendersService.create.mockResolvedValue(mockResult);
 
-      const result = await controller.create(createGenderDto);
+      const result = await controller.create(createGenderDto, { userId });
 
       expect(result).toEqual(mockResult);
-      expect(mockGendersService.create).toHaveBeenCalledWith(createGenderDto);
+      expect(mockGendersService.create).toHaveBeenCalledWith(
+        createGenderDto,
+        userId,
+      );
     });
   });
 
@@ -92,15 +96,17 @@ describe('GendersController', () => {
         name: 'Masculino Atualizado',
         created_at: new Date(),
       };
+      const userId = 1;
 
       mockGendersService.update.mockResolvedValue(mockResult);
 
-      const result = await controller.update('1', updateGenderDto);
+      const result = await controller.update('1', updateGenderDto, { userId });
 
       expect(result).toEqual(mockResult);
       expect(mockGendersService.update).toHaveBeenCalledWith(
         1,
         updateGenderDto,
+        userId,
       );
     });
   });

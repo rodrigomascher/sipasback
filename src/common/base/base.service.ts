@@ -83,8 +83,14 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
   /**
    * Create new item
    */
-  async create(dto: CreateDto): Promise<T> {
+  async create(dto: CreateDto, userId?: number): Promise<T> {
     const data = this.transformForDb(dto);
+
+    // Add created_by and updated_by from authenticated user
+    if (userId) {
+      data.created_by = userId;
+      data.updated_by = userId;
+    }
 
     const result = await this.supabaseService.insert<T>(this.tableName, data);
 
@@ -98,11 +104,16 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
   /**
    * Update item
    */
-  async update(id: number, dto: UpdateDto): Promise<T> {
+  async update(id: number, dto: UpdateDto, userId?: number): Promise<T> {
     // Verify item exists first
     await this.findOne(id);
 
     const data = this.transformForDb(dto);
+
+    // Add updated_by from authenticated user
+    if (userId) {
+      data.updated_by = userId;
+    }
 
     const result = await this.supabaseService.update<T>(this.tableName, data, {
       id,

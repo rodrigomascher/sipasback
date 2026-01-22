@@ -115,7 +115,7 @@ describe('FamilyCompositionController (CRUD with Custom Methods)', () => {
 
       mockFamilyCompositionService.findByFamily.mockResolvedValue(mockMembers);
 
-      const result = await controller.findByFamily(1);
+      const result = await controller.findByFamily('1');
 
       expect(result).toEqual(mockMembers);
       expect(mockFamilyCompositionService.findByFamily).toHaveBeenCalledWith(1);
@@ -124,7 +124,7 @@ describe('FamilyCompositionController (CRUD with Custom Methods)', () => {
     it('should return empty array for family with no members', async () => {
       mockFamilyCompositionService.findByFamily.mockResolvedValue([]);
 
-      const result = await controller.findByFamily(999);
+      const result = await controller.findByFamily('999');
 
       expect(result).toEqual([]);
     });

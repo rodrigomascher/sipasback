@@ -1,6 +1,7 @@
 import { Get, Post, Put, Delete, Param, Body, Query } from '@nestjs/common';
 import { PaginatedResponseDto } from '../dto/paginated-response.dto';
 import { PaginationQueryBuilder } from '../utils/pagination.builder';
+import { GetUser } from '../decorators/get-user.decorator';
 import {
   ApiListOperation,
   ApiGetOperation,
@@ -58,14 +59,18 @@ export abstract class BaseController<T, CreateDto, UpdateDto> {
 
   @Post()
   @ApiCreateOperation()
-  async create(@Body() dto: CreateDto): Promise<T> {
-    return this.service.create(dto);
+  async create(@Body() dto: CreateDto, @GetUser() user: any): Promise<T> {
+    return this.service.create(dto, user?.userId);
   }
 
   @Put(':id')
   @ApiUpdateOperation()
-  async update(@Param('id') id: string, @Body() dto: UpdateDto): Promise<T> {
-    return this.service.update(this.parseId(id), dto);
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateDto,
+    @GetUser() user: any,
+  ): Promise<T> {
+    return this.service.update(this.parseId(id), dto, user?.userId);
   }
 
   @Delete(':id')

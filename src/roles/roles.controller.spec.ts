@@ -106,13 +106,14 @@ describe('RolesController (CRUD)', () => {
         description: 'Manager role',
         isTechnician: false,
       };
+      const userId = 1;
 
       mockRolesService.create.mockResolvedValue(mockResult);
 
-      const result = await controller.create(createDto);
+      const result = await controller.create(createDto, { userId });
 
       expect(result).toEqual(mockResult);
-      expect(mockRolesService.create).toHaveBeenCalledWith(createDto);
+      expect(mockRolesService.create).toHaveBeenCalledWith(createDto, userId);
     });
   });
 
@@ -125,13 +126,18 @@ describe('RolesController (CRUD)', () => {
         description: 'Senior Manager role',
         isTechnician: false,
       };
+      const userId = 1;
 
       mockRolesService.update.mockResolvedValue(mockResult);
 
-      const result = await controller.update('1', updateDto);
+      const result = await controller.update('1', updateDto, { userId });
 
       expect(result).toEqual(mockResult);
-      expect(mockRolesService.update).toHaveBeenCalledWith(1, updateDto);
+      expect(mockRolesService.update).toHaveBeenCalledWith(
+        1,
+        updateDto,
+        userId,
+      );
     });
   });
 

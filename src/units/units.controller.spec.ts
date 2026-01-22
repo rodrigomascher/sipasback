@@ -80,13 +80,17 @@ describe('UnitsController', () => {
         state: 'MG',
       };
       const mockResult = { id: 3, ...createUnitDto };
+      const userId = 1;
 
       mockUnitsService.create.mockResolvedValue(mockResult);
 
-      const result = await controller.create(createUnitDto);
+      const result = await controller.create(createUnitDto, { userId });
 
       expect(result).toEqual(mockResult);
-      expect(mockUnitsService.create).toHaveBeenCalledWith(createUnitDto);
+      expect(mockUnitsService.create).toHaveBeenCalledWith(
+        createUnitDto,
+        userId,
+      );
     });
 
     it('should update a unit', async () => {
@@ -97,13 +101,18 @@ describe('UnitsController', () => {
         city: 'São Paulo',
         state: 'SP',
       };
+      const userId = 1;
 
       mockUnitsService.update.mockResolvedValue(mockResult);
 
-      const result = await controller.update('1', updateUnitDto);
+      const result = await controller.update('1', updateUnitDto, { userId });
 
       expect(result).toEqual(mockResult);
-      expect(mockUnitsService.update).toHaveBeenCalledWith(1, updateUnitDto);
+      expect(mockUnitsService.update).toHaveBeenCalledWith(
+        1,
+        updateUnitDto,
+        userId,
+      );
     });
   });
 

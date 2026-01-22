@@ -114,25 +114,27 @@ describe('BaseController', () => {
   });
 
   describe('create', () => {
-    it('should call service.create with dto', async () => {
+    it('should call service.create with dto and userId', async () => {
       const spyCreate = jest.spyOn(service, 'create');
       const createDto = { name: 'New Test' };
+      const userId = 1;
 
-      const result = await controller.create(createDto);
+      const result = await controller.create(createDto, { userId });
 
-      expect(spyCreate).toHaveBeenCalledWith(createDto);
+      expect(spyCreate).toHaveBeenCalledWith(createDto, userId);
       expect(result).toEqual({ id: 1, name: 'New Test' });
     });
   });
 
   describe('update', () => {
-    it('should call service.update with id and dto', async () => {
+    it('should call service.update with id, dto and userId', async () => {
       const spyUpdate = jest.spyOn(service, 'update');
       const updateDto = { name: 'Updated' };
+      const userId = 1;
 
-      const result = await controller.update('1', updateDto);
+      const result = await controller.update('1', updateDto, { userId });
 
-      expect(spyUpdate).toHaveBeenCalledWith(1, updateDto);
+      expect(spyUpdate).toHaveBeenCalledWith(1, updateDto, userId);
       expect(result).toEqual({ id: 1, name: 'Updated' });
     });
   });

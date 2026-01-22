@@ -128,18 +128,28 @@ describe('BaseService', () => {
   });
 
   describe('create', () => {
-    it('should create a new record', async () => {
+    it('should create a new record with userId', async () => {
       const createDto = { name: 'New Test', description: 'New Desc' };
-      const mockResult = { id: 1, name: 'New Test', description: 'New Desc' };
+      const userId = 1;
+      const mockResult = {
+        id: 1,
+        name: 'New Test',
+        description: 'New Desc',
+        created_by: userId,
+        updated_by: userId,
+      };
 
       mockSupabaseService.insert.mockResolvedValue([mockResult]);
 
-      const result = await service.create(createDto);
+      const result = await service.create(createDto, userId);
 
       expect(result).toEqual(mockResult);
       expect(mockSupabaseService.insert).toHaveBeenCalledWith(
         'test_table',
-        expect.any(Object),
+        expect.objectContaining({
+          created_by: userId,
+          updated_by: userId,
+        }),
       );
     });
 
@@ -148,15 +158,16 @@ describe('BaseService', () => {
 
       mockSupabaseService.insert.mockResolvedValue([]);
 
-      await expect(service.create(createDto)).rejects.toThrow();
+      await expect(service.create(createDto, 1)).rejects.toThrow();
     });
   });
 
   describe('update', () => {
-    it('should update a record', async () => {
+    it('should update a record with userId', async () => {
       const id = 1;
       const updateDto = { name: 'Updated', description: 'Updated Desc' };
-      const mockResult = { id, ...updateDto };
+      const userId = 2;
+      const mockResult = { id, ...updateDto, updated_by: userId };
 
       mockSupabaseService.select.mockResolvedValue([
         { id: 1, name: 'Test 1', description: 'Desc 1' },
@@ -164,12 +175,14 @@ describe('BaseService', () => {
 
       mockSupabaseService.update.mockResolvedValue([mockResult]);
 
-      const result = await service.update(id, updateDto);
+      const result = await service.update(id, updateDto, userId);
 
       expect(result).toEqual(mockResult);
       expect(mockSupabaseService.update).toHaveBeenCalledWith(
         'test_table',
-        expect.any(Object),
+        expect.objectContaining({
+          updated_by: userId,
+        }),
         { id: 1 },
       );
     });
