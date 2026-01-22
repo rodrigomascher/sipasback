@@ -22,7 +22,7 @@ export class PersonsService {
    */
   async findAll(paginationQuery: PaginationQueryDto): Promise<PaginatedResponseDto<any>> {
     const query =
-      'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, nickname, birth_date, sex, gender_id, gender_identity_id, sexual_orientation_id, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
+      'id, created_at, updated_at, created_by, updated_by, first_name, last_name, birth_date, gender_id, gender_identity_id, sexual_orientation_id, cpf';
 
     const offset = paginationQuery.getOffset();
 
