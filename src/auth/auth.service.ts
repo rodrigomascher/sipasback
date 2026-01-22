@@ -274,4 +274,92 @@ export class AuthService {
   async comparePassword(password: string, hash: string): Promise<boolean> {
     return bcrypt.compare(password, hash);
   }
+
+  /**
+   * Decode JWT and get user info
+   */
+  getUserFromToken(token: string): any {
+    try {
+      const decoded = this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+      });
+      return {
+        id: decoded.sub,
+        email: decoded.email,
+        name: decoded.name,
+        employeeId: decoded.employeeId || null,
+        unitId: decoded.unitId,
+        unitName: decoded.unitName,
+        unitType: decoded.unitType,
+        departmentId: decoded.departmentId,
+        departmentName: decoded.departmentName,
+        roleId: decoded.roleId || null,
+        roleName: decoded.roleName,
+        isTechnician: decoded.isTechnician || false,
+        isArmoredUnit: decoded.isArmoredUnit || false,
+        city: decoded.city,
+        state: decoded.state,
+      };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  /**
+   * Select unit and return new JWT token with unit in payload
+   */
+  async selectUnit(
+    user: any,
+    unitId: number,
+  ): Promise<{ access_token: string; token_type: string; expires_in: number; user: any }> {
+    // Buscar dados da unidade
+    const units = await this.supabaseService.select('units', '*', {
+      id: unitId,
+    });
+
+    if (!units || units.length === 0) {
+      throw new Error('Unit not found');
+    }
+
+    const unit = units[0] as any;
+
+    // Criar payload com a unidade selecionada
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+      employeeId: user.employeeId || null,
+      unitId: unit.id,
+      unitName: unit.name,
+      unitType: unit.type,
+      departmentId: user.departmentId,
+      departmentName: user.departmentName,
+      roleId: user.roleId || null,
+      roleName: user.roleName,
+      isTechnician: user.isTechnician || false,
+      isArmoredUnit: unit.is_armored || false,
+      city: unit.city,
+      state: unit.state,
+    };
+
+    const access_token = this.jwtService.sign(payload, {
+      expiresIn: '1h',
+      secret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+    });
+
+    return {
+      access_token,
+      token_type: 'Bearer',
+      expires_in: 3600,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        roleName: user.roleName,
+        unitName: unit.name,
+        unitId: unit.id,
+        units: user.units || [],
+      },
+    };
+  }
 }

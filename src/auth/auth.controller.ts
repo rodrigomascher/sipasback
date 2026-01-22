@@ -5,6 +5,8 @@ import {
   HttpCode,
   HttpStatus,
   UnauthorizedException,
+  BadRequestException,
+  Req,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -106,6 +108,62 @@ export class AuthController {
         {
           email: loginDto.email,
           action: 'register',
+          module: 'auth',
+          timestamp: new Date(),
+        },
+        error,
+      );
+      throw error;
+    }
+  }
+
+  @Post('select-unit')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Select unit and get new JWT token with unit in payload' })
+  @ApiResponse({
+    status: 200,
+    description: 'Unit selected. New token generated with unit in payload.',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid unit ID',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized',
+  })
+  async selectUnit(@Body() body: { unitId: number }, @Req() req: any) {
+    try {
+      if (!body.unitId) {
+        throw new BadRequestException('Unit ID is required');
+      }
+
+      // Obter usuário do JWT atual
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        throw new UnauthorizedException('No token provided');
+      }
+
+      const token = authHeader.substring(7);
+      const user = this.authService.getUserFromToken(token);
+
+      if (!user) {
+        throw new UnauthorizedException('Invalid token');
+      }
+
+      // Obter dados da unidade selecionada
+      const result = await this.authService.selectUnit(user, body.unitId);
+
+      this.logger.logAudit(user.id, 'SELECT_UNIT', 'unit', {
+        unitId: body.unitId,
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.logError(
+        {
+          action: 'select-unit',
           module: 'auth',
           timestamp: new Date(),
         },
