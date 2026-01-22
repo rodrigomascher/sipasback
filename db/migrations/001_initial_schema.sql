@@ -35,7 +35,7 @@ CREATE INDEX idx_units_updated_by ON public.units(updated_by);
 -- ============================================
 CREATE TABLE IF NOT EXISTS public.departments (
   id BIGSERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL UNIQUE,
+  description VARCHAR(255) NOT NULL UNIQUE,
   unit_id BIGINT NOT NULL REFERENCES public.units(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

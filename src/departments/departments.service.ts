@@ -13,7 +13,7 @@ export class DepartmentsService extends BaseService<
 > {
   protected tableName = 'departments';
   protected columns =
-    'id, name, unit_id, created_by, updated_by, created_at, updated_at';
+    'id, description, unit_id, created_by, updated_by, created_at, updated_at';
 
   constructor(supabaseService: SupabaseService) {
     super(supabaseService);

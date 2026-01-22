@@ -31,7 +31,7 @@ export interface SexualOrientation extends BaseEntity {
 }
 
 export interface Department extends BaseEntity {
-  name: string;
+  description: string;
   unit_id: number;
   created_by: number | null;
   updated_by: number | null;

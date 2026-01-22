@@ -12,12 +12,12 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
  * DTO for creating a new department
  */
 export class CreateDepartmentDto {
-  @ApiProperty({ description: 'Department name', example: 'Engineering' })
+  @ApiProperty({ description: 'Department description', example: 'Engineering' })
   @IsString()
   @IsNotEmpty()
   @MinLength(3)
   @MaxLength(255)
-  name: string;
+  description: string;
 
   @ApiProperty({ description: 'Unit ID', example: 1 })
   @IsNumber()
@@ -30,14 +30,14 @@ export class CreateDepartmentDto {
  */
 export class UpdateDepartmentDto {
   @ApiPropertyOptional({
-    description: 'Department name',
+    description: 'Department description',
     example: 'Engineering',
   })
   @IsString()
   @IsOptional()
   @MinLength(3)
   @MaxLength(255)
-  name?: string;
+  description?: string;
 
   @ApiPropertyOptional({ description: 'Unit ID', example: 1 })
   @IsNumber()
@@ -52,8 +52,8 @@ export class DepartmentDto {
   @ApiProperty({ description: 'Department ID', example: 1 })
   id: number;
 
-  @ApiProperty({ description: 'Department name', example: 'Engineering' })
-  name: string;
+  @ApiProperty({ description: 'Department description', example: 'Engineering' })
+  description: string;
 
   @ApiProperty({ description: 'Unit ID', example: 1 })
   unitId: number;
