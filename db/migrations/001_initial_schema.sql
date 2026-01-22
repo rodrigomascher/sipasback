@@ -131,13 +131,13 @@ VALUES
 ON CONFLICT (name) DO NOTHING;
 
 -- Insert sample departments
-INSERT INTO public.departments (name, unit_id)
+INSERT INTO public.departments (description, unit_id)
 SELECT 'Administration', id FROM public.units WHERE name = 'Headquarters'
-ON CONFLICT (name) DO NOTHING;
+ON CONFLICT (description) DO NOTHING;
 
-INSERT INTO public.departments (name, unit_id)
+INSERT INTO public.departments (description, unit_id)
 SELECT 'Engineering', id FROM public.units WHERE name = 'Headquarters'
-ON CONFLICT (name) DO NOTHING;
+ON CONFLICT (description) DO NOTHING;
 
 -- Insert sample roles
 INSERT INTO public.roles (name, description, is_technician)
