@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BaseController } from './base.controller';
 import { BaseService } from './base.service';
-import { PaginationQueryDto } from '../dto/paginated-response.dto';
+import {
+  PaginatedResponseDto,
+  PaginationQueryDto,
+} from '../dto/paginated-response.dto';
 import { SupabaseService } from '../../database/supabase.service';
 
 // Mock implementation of BaseController and BaseService for testing
@@ -18,12 +21,12 @@ class TestableService extends BaseService<any, any, any> {
   }
 
   async findAll(query: PaginationQueryDto) {
-    return {
-      data: [{ id: 1, name: 'Test' }],
-      total: 1,
-      page: query.page || 1,
-      pageSize: query.pageSize || 10,
-    };
+    return new PaginatedResponseDto(
+      [{ id: 1, name: 'Test' }],
+      1,
+      query.page || 1,
+      query.pageSize || 10,
+    );
   }
 
   async findOne(id: any) {
@@ -38,8 +41,8 @@ class TestableService extends BaseService<any, any, any> {
     return { id, ...dto };
   }
 
-  async remove(id: any) {
-    return;
+  async remove(id: any): Promise<boolean> {
+    return true;
   }
 
   async count() {

@@ -62,7 +62,7 @@ describe('PersonsService', () => {
       mockSupabaseService.select.mockResolvedValue([]);
       mockSupabaseService.insert.mockResolvedValue(mockResult);
 
-      const result = await service.create(createPersonDto, userId);
+      const result = await service.create(createPersonDto);
 
       expect(mockSupabaseService.select).toHaveBeenCalledWith('person', 'id', {
         cpf: '123.456.789-00',
@@ -84,7 +84,7 @@ describe('PersonsService', () => {
       const existingPerson = [{ id: 999, cpf: '123.456.789-00' }];
       mockSupabaseService.select.mockResolvedValue(existingPerson);
 
-      await expect(service.create(createPersonDto, 5)).rejects.toThrow(
+      await expect(service.create(createPersonDto)).rejects.toThrow(
         ConflictException,
       );
       expect(mockSupabaseService.insert).not.toHaveBeenCalled();
@@ -112,7 +112,7 @@ describe('PersonsService', () => {
 
       mockSupabaseService.insert.mockResolvedValue(mockResult);
 
-      const result = await service.create(createPersonDto, userId);
+      const result = await service.create(createPersonDto);
 
       expect(mockSupabaseService.select).not.toHaveBeenCalled();
       expect(result.firstName).toBe('João');
@@ -269,9 +269,9 @@ describe('PersonsService', () => {
 
       mockSupabaseService.select.mockResolvedValue([]);
 
-      await expect(
-        service.update(personId, updatePersonDto, 6),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update(personId, updatePersonDto)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw ConflictException if updated CPF already exists', async () => {
@@ -287,9 +287,9 @@ describe('PersonsService', () => {
         .mockResolvedValueOnce(existingPerson)
         .mockResolvedValueOnce(duplicateCpfPerson);
 
-      await expect(
-        service.update(personId, updatePersonDto, 6),
-      ).rejects.toThrow(ConflictException);
+      await expect(service.update(personId, updatePersonDto)).rejects.toThrow(
+        ConflictException,
+      );
       expect(mockSupabaseService.update).not.toHaveBeenCalled();
     });
   });
@@ -669,7 +669,7 @@ describe('PersonsService', () => {
       mockSupabaseService.select.mockResolvedValue([]);
       mockSupabaseService.insert.mockResolvedValue(mockResult);
 
-      const result = await service.create(createPersonDto, userId);
+      const result = await service.create(createPersonDto);
 
       expect(result.firstName).toBe('João');
       expect(result.monthlyIncome).toBe(5000);

@@ -6,10 +6,11 @@ import { NotFoundException } from '@nestjs/common';
 
 // Mock implementation of BaseService for testing
 class TestableBaseService extends BaseService<any, any, any> {
+  protected tableName: string = 'test_table';
+  protected columns: string = 'id, name, description';
+
   constructor(protected supabaseService: SupabaseService) {
     super(supabaseService);
-    this.tableName = 'test_table';
-    this.columns = 'id, name, description';
   }
 
   mapData(data: any): any {
