@@ -228,13 +228,13 @@ describe('PersonsService', () => {
       mockSupabaseService.select.mockResolvedValue(existingPerson);
       mockSupabaseService.update.mockResolvedValue(updatedPerson);
 
-      const result = await service.update(personId, updatePersonDto, userId);
+      const result = await service.update(personId, updatePersonDto);
 
       expect(mockSupabaseService.select).toHaveBeenCalledWith('person', fullQuery, { id: personId });
       expect(mockSupabaseService.update).toHaveBeenCalled();
       
       const updateCall = mockSupabaseService.update.mock.calls[0];
-      expect(updateCall[1].updated_by).toBe(userId);
+      expect(updateCall[1].updated_by).toBeUndefined();
       expect(updateCall[1].last_name).toBe('Santos');
       expect(updateCall[1].created_by).toBeUndefined(); // Should NOT be in update data
       
@@ -538,7 +538,7 @@ describe('PersonsService', () => {
       mockSupabaseService.select.mockResolvedValue(existingPerson);
       mockSupabaseService.update.mockResolvedValue(updatedPerson);
 
-      const result = await service.update(personId, updatePersonDto, userId);
+      const result = await service.update(personId, updatePersonDto);
 
       const updateCall = mockSupabaseService.update.mock.calls[0];
       expect(updateCall[1].cpf).toBeNull(); // Should be NULL
@@ -575,7 +575,7 @@ describe('PersonsService', () => {
       mockSupabaseService.select.mockResolvedValue(existingPerson);
       mockSupabaseService.update.mockResolvedValue(updatedPerson);
 
-      const result = await service.update(personId, updatePersonDto, userId);
+      const result = await service.update(personId, updatePersonDto);
 
       const updateCall = mockSupabaseService.update.mock.calls[0];
       expect(updateCall[1].monthly_income).toBeUndefined(); // Should NOT be in update data

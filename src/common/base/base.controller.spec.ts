@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BaseController } from './base.controller';
 import { BaseService } from './base.service';
 import { PaginationQueryDto } from '../dto/paginated-response.dto';
+import { SupabaseService } from '../../database/supabase.service';
 
 // Mock implementation of BaseController and BaseService for testing
 class TestableService extends BaseService<any, any, any> {
@@ -37,7 +38,7 @@ class TestableService extends BaseService<any, any, any> {
     return { id, ...dto };
   }
 
-  async delete(id: any) {
+  async remove(id: any) {
     return;
   }
 
@@ -56,14 +57,17 @@ describe('BaseController', () => {
   let controller: TestableController;
   let service: TestableService;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [TestableController],
-      providers: [TestableService],
-    }).compile();
+  beforeEach(() => {
+    const mockSupabaseService: any = {
+      select: jest.fn(),
+      selectWithCount: jest.fn(),
+      insert: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    };
 
-    controller = module.get<TestableController>(TestableController);
-    service = module.get<TestableService>(TestableService);
+    service = new TestableService(mockSupabaseService);
+    controller = new TestableController(service);
   });
 
   describe('findAll', () => {
@@ -95,8 +99,8 @@ describe('BaseController', () => {
 
       const result = await controller.findOne('1');
 
-      expect(spyFindOne).toHaveBeenCalledWith('1');
-      expect(result).toEqual({ id: '1', name: 'Test' });
+      expect(spyFindOne).toHaveBeenCalledWith(1);
+      expect(result).toEqual({ id: 1, name: 'Test' });
     });
   });
 
@@ -119,18 +123,19 @@ describe('BaseController', () => {
 
       const result = await controller.update('1', updateDto);
 
-      expect(spyUpdate).toHaveBeenCalledWith('1', updateDto);
-      expect(result).toEqual({ id: '1', name: 'Updated' });
+      expect(spyUpdate).toHaveBeenCalledWith(1, updateDto);
+      expect(result).toEqual({ id: 1, name: 'Updated' });
     });
   });
 
-  describe('delete', () => {
-    it('should call service.delete with correct id', async () => {
-      const spyDelete = jest.spyOn(service, 'delete');
+  describe('remove', () => {
+    it('should call service.remove with correct id', async () => {
+      const spyRemove = jest.spyOn(service, 'remove');
 
-      await controller.delete('1');
+      const result = await controller.remove('1');
 
-      expect(spyDelete).toHaveBeenCalledWith('1');
+      expect(spyRemove).toHaveBeenCalledWith(1);
+      expect(result).toEqual({ success: true });
     });
   });
 });

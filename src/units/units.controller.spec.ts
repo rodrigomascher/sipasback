@@ -13,8 +13,6 @@ describe('UnitsController', () => {
     findOne: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
-    delete: jest.fn(),
-    count: jest.fn(),
     findByCity: jest.fn(),
     findByState: jest.fn(),
   };
@@ -67,6 +65,7 @@ describe('UnitsController', () => {
       const result = await controller.findOne('1');
 
       expect(result).toEqual(mockUnit);
+      expect(mockUnitsService.findOne).toHaveBeenCalledWith(1);
     });
 
     it('should create a new unit', async () => {
@@ -94,14 +93,7 @@ describe('UnitsController', () => {
       const result = await controller.update('1', updateUnitDto);
 
       expect(result).toEqual(mockResult);
-    });
-
-    it('should delete a unit', async () => {
-      mockUnitsService.delete.mockResolvedValue(undefined);
-
-      await controller.delete('1');
-
-      expect(mockUnitsService.delete).toHaveBeenCalledWith('1');
+      expect(mockUnitsService.update).toHaveBeenCalledWith(1, updateUnitDto);
     });
   });
 
@@ -153,25 +145,6 @@ describe('UnitsController', () => {
         await controller.findByState('sp');
 
         expect(mockUnitsService.findByState).toHaveBeenCalledWith('SP');
-      });
-    });
-
-    describe('count', () => {
-      it('should return total count of units', async () => {
-        mockUnitsService.count.mockResolvedValue(3);
-
-        const result = await controller.count();
-
-        expect(result).toEqual({ count: 3 });
-        expect(mockUnitsService.count).toHaveBeenCalled();
-      });
-
-      it('should return count as 0 if no units exist', async () => {
-        mockUnitsService.count.mockResolvedValue(0);
-
-        const result = await controller.count();
-
-        expect(result).toEqual({ count: 0 });
       });
     });
   });

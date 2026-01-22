@@ -109,10 +109,10 @@ describe('RolesController (CRUD)', () => {
 
       mockRolesService.create.mockResolvedValue(mockResult);
 
-      const result = await controller.create(createDto, 1);
+      const result = await controller.create(createDto);
 
       expect(result).toEqual(mockResult);
-      expect(mockRolesService.create).toHaveBeenCalledWith(createDto, 1);
+      expect(mockRolesService.create).toHaveBeenCalledWith(createDto);
     });
   });
 
@@ -128,10 +128,10 @@ describe('RolesController (CRUD)', () => {
 
       mockRolesService.update.mockResolvedValue(mockResult);
 
-      const result = await controller.update(1, updateDto, 1);
+      const result = await controller.update('1', updateDto);
 
       expect(result).toEqual(mockResult);
-      expect(mockRolesService.update).toHaveBeenCalledWith(1, updateDto, 1);
+      expect(mockRolesService.update).toHaveBeenCalledWith(1, updateDto);
     });
   });
 
@@ -144,7 +144,7 @@ describe('RolesController (CRUD)', () => {
 
       mockRolesService.findByTechnician.mockResolvedValue(mockRoles);
 
-      const result = await controller.findByTechnician(true);
+      const result = await controller.findByTechnician('true');
 
       expect(result).toEqual(mockRoles);
       expect(mockRolesService.findByTechnician).toHaveBeenCalledWith(true);

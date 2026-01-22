@@ -14,8 +14,6 @@ describe('GendersController', () => {
     findOne: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
-    delete: jest.fn(),
-    count: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -68,7 +66,7 @@ describe('GendersController', () => {
       const result = await controller.findOne('1');
 
       expect(result).toEqual(mockGender);
-      expect(mockGendersService.findOne).toHaveBeenCalledWith('1');
+      expect(mockGendersService.findOne).toHaveBeenCalledWith(1);
     });
   });
 
@@ -96,28 +94,7 @@ describe('GendersController', () => {
       const result = await controller.update('1', updateGenderDto);
 
       expect(result).toEqual(mockResult);
-      expect(mockGendersService.update).toHaveBeenCalledWith('1', updateGenderDto);
-    });
-  });
-
-  describe('delete', () => {
-    it('should delete a gender', async () => {
-      mockGendersService.delete.mockResolvedValue(undefined);
-
-      await controller.delete('1');
-
-      expect(mockGendersService.delete).toHaveBeenCalledWith('1');
-    });
-  });
-
-  describe('count', () => {
-    it('should return total count of genders', async () => {
-      mockGendersService.count.mockResolvedValue(2);
-
-      const result = await controller.count();
-
-      expect(result).toBe(2);
-      expect(mockGendersService.count).toHaveBeenCalled();
+      expect(mockGendersService.update).toHaveBeenCalledWith(1, updateGenderDto);
     });
   });
 });

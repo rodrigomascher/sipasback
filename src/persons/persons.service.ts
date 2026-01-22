@@ -30,7 +30,24 @@ export class PersonsService extends BaseService<
   protected transformForDb(
     dto: CreatePersonDto | UpdatePersonDto,
   ): any {
-    return toSnakeCase(dto);
+    const transformed = toSnakeCase(dto);
+    
+    // Convert empty CPF to null
+    if (transformed.cpf === '') {
+      transformed.cpf = null;
+    }
+    
+    // Filter out empty numeric fields (like monthlyIncome)
+    const filtered: any = {};
+    for (const [key, value] of Object.entries(transformed)) {
+      // Skip empty string values for numeric fields
+      if (value === '' && (key === 'monthly_income' || key === 'annual_income')) {
+        continue;
+      }
+      filtered[key] = value;
+    }
+    
+    return filtered;
   }
 
   /**

@@ -125,11 +125,12 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
   /**
    * Remove item by ID
    */
-  async remove(id: number): Promise<void> {
+  async remove(id: number): Promise<boolean> {
     // Verify item exists first
     await this.findOne(id);
 
     await this.supabaseService.delete(this.tableName, { id });
+    return true;
   }
 
   /**

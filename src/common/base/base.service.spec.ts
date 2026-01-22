@@ -59,13 +59,10 @@ describe('BaseService', () => {
         { id: 2, name: 'Test 2', description: 'Desc 2' },
       ];
 
-      const mockResult = {
+      mockSupabaseService.selectWithCount.mockResolvedValue({
         data: mockData,
         count: 2,
-        error: null,
-      };
-
-      mockSupabaseService.selectWithCount.mockResolvedValue(mockResult);
+      });
 
       const paginationQuery = new PaginationQueryDto({
         page: 1,
@@ -89,7 +86,6 @@ describe('BaseService', () => {
       mockSupabaseService.selectWithCount.mockResolvedValue({
         data: mockData,
         count: 100,
-        error: null,
       });
 
       const paginationQuery = new PaginationQueryDto({
@@ -111,26 +107,20 @@ describe('BaseService', () => {
     it('should return a single record by id', async () => {
       const mockData = { id: 1, name: 'Test 1', description: 'Desc 1' };
 
-      mockSupabaseService.select.mockResolvedValue({
-        data: [mockData],
-        error: null,
-      });
+      mockSupabaseService.select.mockResolvedValue([mockData]);
 
       const result = await service.findOne(1);
 
       expect(result).toEqual(mockData);
       expect(mockSupabaseService.select).toHaveBeenCalledWith(
         'test_table',
-        { eq: ['id', 1] },
-        expect.any(Object)
+        ['id', 'name', 'description'],
+        { id: 1 },
       );
     });
 
     it('should throw NotFoundException when record not found', async () => {
-      mockSupabaseService.select.mockResolvedValue({
-        data: [],
-        error: null,
-      });
+      mockSupabaseService.select.mockResolvedValue([]);
 
       await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
     });
@@ -141,10 +131,7 @@ describe('BaseService', () => {
       const createDto = { name: 'New Test', description: 'New Desc' };
       const mockResult = { id: 1, name: 'New Test', description: 'New Desc' };
 
-      mockSupabaseService.insert.mockResolvedValue({
-        data: [mockResult],
-        error: null,
-      });
+      mockSupabaseService.insert.mockResolvedValue([mockResult]);
 
       const result = await service.create(createDto);
 
@@ -158,10 +145,7 @@ describe('BaseService', () => {
     it('should throw error when insert fails', async () => {
       const createDto = { name: 'New Test', description: 'New Desc' };
 
-      mockSupabaseService.insert.mockResolvedValue({
-        data: null,
-        error: { message: 'Insert failed' },
-      });
+      mockSupabaseService.insert.mockResolvedValue([]);
 
       await expect(service.create(createDto)).rejects.toThrow();
     });
@@ -173,10 +157,11 @@ describe('BaseService', () => {
       const updateDto = { name: 'Updated', description: 'Updated Desc' };
       const mockResult = { id, ...updateDto };
 
-      mockSupabaseService.update.mockResolvedValue({
-        data: [mockResult],
-        error: null,
-      });
+      mockSupabaseService.select.mockResolvedValue([
+        { id: 1, name: 'Test 1', description: 'Desc 1' },
+      ]);
+
+      mockSupabaseService.update.mockResolvedValue([mockResult]);
 
       const result = await service.update(id, updateDto);
 
@@ -184,15 +169,12 @@ describe('BaseService', () => {
       expect(mockSupabaseService.update).toHaveBeenCalledWith(
         'test_table',
         expect.any(Object),
-        expect.any(Object)
+        { id: 1 }
       );
     });
 
     it('should throw NotFoundException when record to update not found', async () => {
-      mockSupabaseService.select.mockResolvedValue({
-        data: [],
-        error: null,
-      });
+      mockSupabaseService.select.mockResolvedValue([]);
 
       await expect(
         service.update(999, { name: 'Updated' })
@@ -200,32 +182,26 @@ describe('BaseService', () => {
     });
   });
 
-  describe('delete', () => {
+  describe('remove', () => {
     it('should delete a record', async () => {
-      mockSupabaseService.select.mockResolvedValue({
-        data: [{ id: 1, name: 'Test 1', description: 'Desc 1' }],
-        error: null,
-      });
+      mockSupabaseService.select.mockResolvedValue([
+        { id: 1, name: 'Test 1', description: 'Desc 1' },
+      ]);
 
-      mockSupabaseService.delete.mockResolvedValue({
-        error: null,
-      });
+      mockSupabaseService.delete.mockResolvedValue(undefined);
 
-      await service.delete(1);
+      await service.remove(1);
 
       expect(mockSupabaseService.delete).toHaveBeenCalledWith(
         'test_table',
-        expect.any(Object)
+        { id: 1 }
       );
     });
 
     it('should throw NotFoundException when record to delete not found', async () => {
-      mockSupabaseService.select.mockResolvedValue({
-        data: [],
-        error: null,
-      });
+      mockSupabaseService.select.mockResolvedValue([]);
 
-      await expect(service.delete(999)).rejects.toThrow(NotFoundException);
+      await expect(service.remove(999)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -234,7 +210,6 @@ describe('BaseService', () => {
       mockSupabaseService.selectWithCount.mockResolvedValue({
         count: 42,
         data: [],
-        error: null,
       });
 
       const result = await service.count();
