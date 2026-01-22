@@ -2,78 +2,31 @@ import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import { CreateSexualOrientationDto } from './dto/create-sexual-orientation.dto';
 import { UpdateSexualOrientationDto } from './dto/update-sexual-orientation.dto';
-import {
-  PaginatedResponseDto,
-  PaginationQueryDto,
-} from '../common/dto/paginated-response.dto';
 import { toCamelCase, toSnakeCase } from '../common/utils/transform.utils';
 import { SexualOrientation } from '../common/types/database.types';
+import { BaseService } from '../common/base/base.service';
 
 @Injectable()
-export class SexualOrientationsService {
-  constructor(private supabaseService: SupabaseService) {}
+export class SexualOrientationsService extends BaseService<
+  SexualOrientation,
+  CreateSexualOrientationDto,
+  UpdateSexualOrientationDto
+> {
+  protected tableName = 'sexual_orientation';
+  protected columns =
+    'id, description, active, created_by, updated_by, created_at, updated_at';
 
-  async create(createSexualOrientationDto: CreateSexualOrientationDto) {
-    const snakeCaseData = toSnakeCase(createSexualOrientationDto);
-    const result = await this.supabaseService.insert<SexualOrientation>(
-      'sexual_orientation',
-      snakeCaseData,
-    );
-    return result?.[0] ? toCamelCase(result[0]) : null;
+  constructor(supabaseService: SupabaseService) {
+    super(supabaseService);
   }
 
-  async findAll(
-    paginationQuery: PaginationQueryDto,
-  ): Promise<PaginatedResponseDto<any>> {
-    const columns =
-      'id, description, active, created_by, updated_by, created_at, updated_at';
-    const offset = paginationQuery.getOffset();
-
-    // Get paginated data with count
-    const { data, count } =
-      await this.supabaseService.selectWithCount<SexualOrientation>(
-        'sexual_orientation',
-        columns,
-        {},
-        paginationQuery.sortBy,
-        paginationQuery.sortDirection,
-        paginationQuery.pageSize,
-        offset,
-      );
-
-    const mappedData = data?.map((item) => toCamelCase(item)) || [];
-    return new PaginatedResponseDto(
-      mappedData,
-      count || 0,
-      paginationQuery.page,
-      paginationQuery.pageSize,
-    );
+  protected mapData(data: SexualOrientation): any {
+    return toCamelCase(data);
   }
 
-  async findOne(id: number) {
-    const result = await this.supabaseService.select<SexualOrientation>(
-      'sexual_orientation',
-      'id, description, active, created_by, updated_by, created_at, updated_at',
-      { id },
-    );
-    return result?.[0] ? toCamelCase(result[0]) : null;
-  }
-
-  async update(
-    id: number,
-    updateSexualOrientationDto: UpdateSexualOrientationDto,
-  ) {
-    const snakeCaseData = toSnakeCase(updateSexualOrientationDto);
-    const result = await this.supabaseService.update<SexualOrientation>(
-      'sexual_orientation',
-      snakeCaseData,
-      { id },
-    );
-    return result?.[0] ? toCamelCase(result[0]) : null;
-  }
-
-  async remove(id: number) {
-    await this.supabaseService.delete('sexual_orientation', { id });
-    return { success: true };
+  protected transformForDb(
+    dto: CreateSexualOrientationDto | UpdateSexualOrientationDto,
+  ): any {
+    return toSnakeCase(dto);
   }
 }
