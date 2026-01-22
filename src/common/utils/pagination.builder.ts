@@ -11,6 +11,8 @@
  * });
  * return this.service.findAll(pagination);
  */
+import { PaginationQueryDto } from '../dto/paginated-response.dto';
+
 export class PaginationQueryBuilder {
   /**
    * Build pagination query from request parameters
@@ -22,14 +24,14 @@ export class PaginationQueryBuilder {
     sortBy?: string;
     sortDirection?: string;
     search?: string;
-  }) {
-    return {
+  }): PaginationQueryDto {
+    return new PaginationQueryDto({
       page: this.parseNumber(query.page, 1),
       pageSize: this.parseNumber(query.pageSize, 10),
       sortBy: query.sortBy || 'id',
       sortDirection: (query.sortDirection as 'asc' | 'desc') || 'asc',
       search: query.search,
-    };
+    });
   }
 
   /**

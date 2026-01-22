@@ -10,51 +10,49 @@ export interface BaseEntity {
 }
 
 export interface Gender extends BaseEntity {
-  name: string;
-  created_by: number;
+  description: string;
+  active?: boolean;
+  created_by: number | null;
   updated_by: number | null;
 }
 
 export interface GenderIdentity extends BaseEntity {
-  name: string;
-  created_by: number;
+  description: string;
+  active?: boolean;
+  created_by: number | null;
   updated_by: number | null;
 }
 
 export interface SexualOrientation extends BaseEntity {
-  name: string;
-  created_by: number;
+  description: string;
+  active?: boolean;
+  created_by: number | null;
   updated_by: number | null;
 }
 
 export interface Department extends BaseEntity {
   name: string;
-  description?: string | null;
-  unit_id?: number | null;
-  parent_id?: number | null;
-  created_by: number;
+  unit_id: number;
+  created_by: number | null;
   updated_by: number | null;
 }
 
 export interface Employee extends BaseEntity {
   employee_id?: string;
-  full_name?: string;
-  person_id?: number | null;
-  unit_id?: number | null;
-  department_id?: number;
+  full_name: string;
+  unit_id: number;
+  department_id: number;
   role_id?: number | null;
   is_technician?: boolean;
-  start_date?: string;
-  end_date?: string | null;
-  position?: string;
-  created_by: number;
+  created_by: number | null;
   updated_by: number | null;
 }
 
 export interface Role extends BaseEntity {
   name: string;
   description: string | null;
-  created_by: number;
+  is_technician?: boolean;
+  created_by: number | null;
   updated_by: number | null;
 }
 
@@ -64,7 +62,7 @@ export interface Unit extends BaseEntity {
   is_armored?: boolean;
   city?: string;
   state?: string;
-  created_by: number;
+  created_by: number | null;
   updated_by: number | null;
 }
 
@@ -72,16 +70,20 @@ export interface User extends BaseEntity {
   email: string;
   name: string;
   password_hash: string;
+  unit_id: number;
+  department_id: number;
+  role_id?: number | null;
+  employee_id?: number | null;
+  api_key?: string | null;
   is_active: boolean;
   last_login?: string | null;
-  employee_id?: number | null;
-  created_by: number;
+  created_by: number | null;
   updated_by: number | null;
 }
 
 export interface RelationshipDegree extends BaseEntity {
   name: string;
-  created_by: number;
+  created_by: number | null;
   updated_by: number | null;
 }
 
@@ -89,7 +91,7 @@ export interface FamilyComposition extends BaseEntity {
   person_id: number;
   family_member_person_id: number;
   relationship_degree_id: number;
-  created_by: number;
+  created_by: number | null;
   updated_by: number | null;
 }
 
