@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { UserUnitsModule } from './user-units/user-units.module';
 import { UnitsModule } from './units/units.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { RolesModule } from './roles/roles.module';
@@ -20,6 +21,7 @@ import { LoggerModule } from './common/logger/logger.module';
   imports: [
     AuthModule,
     UsersModule,
+    UserUnitsModule,
     UnitsModule,
     DepartmentsModule,
     RolesModule,

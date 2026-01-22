@@ -3,24 +3,28 @@ import { SupabaseService } from '../database/supabase.service';
 import { BaseService } from '../common/base/base.service';
 import { User } from '../common/types/database.types';
 import { AuthService } from '../auth/auth.service';
+import { UserUnitsService } from '../user-units/user-units.service';
 
 export interface UserDto {
   id: number;
   email: string;
   name: string;
   createdAt: Date;
+  units?: any[];
 }
 
 export class CreateUserDto {
   email: string;
   password: string;
   name: string;
+  unitIds?: number[];
 }
 
 export class UpdateUserDto {
   email?: string;
   password?: string;
   name?: string;
+  unitIds?: number[];
 }
 
 @Injectable()
@@ -35,6 +39,7 @@ export class UsersService extends BaseService<
   constructor(
     supabaseService: SupabaseService,
     private authService: AuthService,
+    private userUnitsService: UserUnitsService,
   ) {
     super(supabaseService);
   }
@@ -54,6 +59,8 @@ export class UsersService extends BaseService<
       transformed.password_hash = await this.authService.hashPassword(transformed.password);
       delete transformed.password;
     }
+    // Remove unitIds from database transform (handled separately)
+    delete transformed.unitIds;
     return transformed;
   }
 
@@ -71,4 +78,64 @@ export class UsersService extends BaseService<
     }
     return this.mapData(users[0]);
   }
+
+  /**
+   * Create user with units - wrapper around base create
+   */
+  async createWithUnits(dto: CreateUserDto, userId?: number): Promise<UserDto> {
+    // Create user first (without unitIds)
+    const userDto = { ...dto } as CreateUserDto;
+    const unitIds = userDto.unitIds;
+    delete userDto.unitIds;
+
+    const user = await super.create(userDto, userId);
+
+    // Then add units
+    if (unitIds && unitIds.length > 0) {
+      await this.userUnitsService.setUnitsForUser(user.id, unitIds);
+    }
+
+    // Fetch and return user with units
+    return this.findOneWithUnits(user.id);
+  }
+
+  /**
+   * Update user with units - wrapper around base update
+   */
+  async updateWithUnits(id: number, dto: UpdateUserDto, userId?: number): Promise<UserDto> {
+    // Update user first (without unitIds)
+    const userDto = { ...dto } as UpdateUserDto;
+    const unitIds = userDto.unitIds;
+    delete userDto.unitIds;
+
+    const user = await super.update(id, userDto, userId);
+
+    // Then update units if provided
+    if (unitIds !== undefined) {
+      await this.userUnitsService.setUnitsForUser(id, unitIds);
+    }
+
+    // Fetch and return user with units
+    return this.findOneWithUnits(id);
+  }
+
+  /**
+   * Find one user with their units
+   */
+  async findOneWithUnits(id: number): Promise<UserDto> {
+    const users = await this.supabaseService.select<User>(
+      this.tableName,
+      this.columns,
+      { id },
+    );
+
+    if (!users || users.length === 0) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+
+    const user = this.mapData(users[0]);
+    user.units = await this.userUnitsService.getUnitsForUser(id);
+    return user;
+  }
 }
+
