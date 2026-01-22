@@ -7,9 +7,9 @@ import { NotFoundException } from '@nestjs/common';
 // Mock implementation of BaseService for testing
 class TestableBaseService extends BaseService<any, any, any> {
   constructor(protected supabaseService: SupabaseService) {
-    super();
+    super(supabaseService);
     this.tableName = 'test_table';
-    this.columns = ['id', 'name', 'description'];
+    this.columns = 'id, name, description';
   }
 
   mapData(data: any): any {
@@ -114,7 +114,7 @@ describe('BaseService', () => {
       expect(result).toEqual(mockData);
       expect(mockSupabaseService.select).toHaveBeenCalledWith(
         'test_table',
-        ['id', 'name', 'description'],
+        'id, name, description',
         { id: 1 },
       );
     });

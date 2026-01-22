@@ -7,7 +7,7 @@ import { SupabaseService } from '../../database/supabase.service';
 // Mock implementation of BaseController and BaseService for testing
 class TestableService extends BaseService<any, any, any> {
   tableName = 'test_table';
-  columns = ['id', 'name'];
+  columns = 'id, name';
 
   mapData(data: any): any {
     return data;
