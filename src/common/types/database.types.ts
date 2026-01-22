@@ -94,14 +94,92 @@ export interface FamilyComposition extends BaseEntity {
 }
 
 export interface Person extends BaseEntity {
+  // System & Unit References
+  created_unit_id?: number | null;
+  updated_unit_id?: number | null;
+  referred_unit_id?: number | null;
+  notes?: string | null;
+
+  // Basic Personal Data
   first_name: string;
   last_name: string;
-  birth_date: string | null;
-  gender_id: number | null;
-  gender_identity_id: number | null;
-  cpf: string | null;
-  created_by: number;
-  updated_by: number | null;
+  full_name?: string | null;
+  social_name?: string | null;
+  birth_date?: string | null;
+  sex?: number | null;
+  gender_id?: number | null;
+  gender_identity_id?: number | null;
+  sexual_orientation?: string | null;
+  race_id?: number | null;
+  ethnicity_id?: number | null;
+  community_id?: number | null;
+  marital_status_id?: number | null;
+  nationality?: number | null;
+  origin_country_id?: number | null;
+  arrival_date_brazil?: string | null;
+
+  // Family Links
+  mother_person_id?: number | null;
+  father_person_id?: number | null;
+  mother_rg?: string | null;
+  father_rg?: string | null;
+  mother_residence_order?: number | null;
+  father_residence_order?: number | null;
+
+  // Documentation
+  cpf?: string | null;
+  nis?: number | null;
+  nisn?: string | null;
+  sus_number?: number | null;
+  rg?: string | null;
+  rg_issuance_date?: string | null;
+  rg_state_abbr?: string | null;
+  rg_issuing_org_id?: number | null;
+  rg_complementary?: string | null;
+  photo_id?: number | null;
+
+  // Civil Registry Certificate
+  cert_standard_new?: number | null;
+  cert_term_number?: string | null;
+  cert_book?: string | null;
+  cert_page?: string | null;
+  cert_issuance_date?: string | null;
+  cert_state_abbr?: string | null;
+  cert_registry?: string | null;
+  cert_year?: string | null;
+  cert_issuing_org?: string | null;
+  birth_city?: string | null;
+  birth_subdistrict?: string | null;
+
+  // Electoral, Professional & Military Documents
+  voter_id_number?: string | null;
+  voter_id_zone?: string | null;
+  voter_id_section?: string | null;
+  voter_id_issuance_date?: string | null;
+  prof_card_number?: string | null;
+  prof_card_series?: string | null;
+  prof_card_issuance_date?: string | null;
+  prof_card_state?: string | null;
+  military_registration?: string | null;
+  military_issuance_date?: string | null;
+  military_reserve_number?: string | null;
+
+  // Income
+  income_type_id?: number | null;
+  monthly_income?: number | null;
+  annual_income?: number | null;
+
+  // Education
+  education_level_id?: number | null;
+  school_name?: string | null;
+  completion_year?: number | null;
+  currently_studying?: number | null;
+
+  // Death Data
+  deceased?: number | null;
+  death_cert_issuance_date?: string | null;
+  death_city?: string | null;
+  cemetery?: string | null;
 }
 
 export interface Vehicle extends BaseEntity {

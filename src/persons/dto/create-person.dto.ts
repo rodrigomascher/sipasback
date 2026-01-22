@@ -21,14 +21,27 @@ export class CreatePersonDto {
   lastName: string;
 
   @IsNotEmpty()
-  @IsDateString()
-  birthDate: Date;
-
-  @IsNotEmpty()
   @IsNumber()
   createdBy: number;
 
-  // Basic Personal Data - Optional
+  // System & Unit References
+  @IsOptional()
+  @IsNumber()
+  createdUnitId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  updatedUnitId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  referredUnitId?: number;
+
+  @IsOptional()
+  @IsString()
+  notes?: string;
+
+  // Basic Personal Data
   @IsOptional()
   @IsString()
   fullName?: string;
@@ -36,6 +49,10 @@ export class CreatePersonDto {
   @IsOptional()
   @IsString()
   socialName?: string;
+
+  @IsOptional()
+  @IsDateString()
+  birthDate?: Date;
 
   @IsOptional()
   @IsNumber()
@@ -51,6 +68,9 @@ export class CreatePersonDto {
 
   @IsOptional()
   @IsString()
+  @Matches(/^[A-Z]?$/, {
+    message: 'Sexual orientation must be a single uppercase letter or empty',
+  })
   sexualOrientation?: string;
 
   @IsOptional()
@@ -81,7 +101,7 @@ export class CreatePersonDto {
   @IsDateString()
   arrivalDateBrazil?: Date;
 
-  // Filial - Can link to another person
+  // Family Links
   @IsOptional()
   @IsNumber()
   motherPersonId?: number;
@@ -89,6 +109,14 @@ export class CreatePersonDto {
   @IsOptional()
   @IsNumber()
   fatherPersonId?: number;
+
+  @IsOptional()
+  @IsString()
+  motherRg?: string;
+
+  @IsOptional()
+  @IsString()
+  fatherRg?: string;
 
   @IsOptional()
   @IsNumber()
@@ -101,8 +129,8 @@ export class CreatePersonDto {
   // Documentation
   @IsOptional()
   @IsString()
-  @Matches(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, {
-    message: 'CPF must be in format: 999.999.999-99',
+  @Matches(/^\d{3}\.\d{3}\.\d{3}-\d{2}$|^$/, {
+    message: 'CPF must be in format: 999.999.999-99 or empty',
   })
   cpf?: string;
 
@@ -128,8 +156,8 @@ export class CreatePersonDto {
 
   @IsOptional()
   @IsString()
-  @Matches(/^[A-Z]{2}$/, {
-    message: 'State abbreviation must be 2 uppercase letters',
+  @Matches(/^[A-Z]{2}$|^$/, {
+    message: 'State abbreviation must be 2 uppercase letters or empty',
   })
   rgStateAbbr?: string;
 
@@ -140,6 +168,10 @@ export class CreatePersonDto {
   @IsOptional()
   @IsString()
   rgComplementary?: string;
+
+  @IsOptional()
+  @IsNumber()
+  photoId?: number;
 
   // Civil Registry Certificate
   @IsOptional()
@@ -164,7 +196,9 @@ export class CreatePersonDto {
 
   @IsOptional()
   @IsString()
-  @Matches(/^[A-Z]{2}$/)
+  @Matches(/^[A-Z]{2}$|^$/, {
+    message: 'State abbreviation must be 2 uppercase letters or empty',
+  })
   certStateAbbr?: string;
 
   @IsOptional()
@@ -173,7 +207,9 @@ export class CreatePersonDto {
 
   @IsOptional()
   @IsString()
-  @Matches(/^\d{4}$/, { message: 'Cert year must be 4 digits' })
+  @Matches(/^\d{4}$|^$/, {
+    message: 'Cert year must be 4 digits or empty',
+  })
   certYear?: string;
 
   @IsOptional()
@@ -188,7 +224,7 @@ export class CreatePersonDto {
   @IsString()
   birthSubdistrict?: string;
 
-  // Electoral, Professional & Military Documents
+  // Electoral Documents
   @IsOptional()
   @IsString()
   voterIdNumber?: string;
@@ -205,6 +241,7 @@ export class CreatePersonDto {
   @IsDateString()
   voterIdIssuanceDate?: Date;
 
+  // Professional Card
   @IsOptional()
   @IsString()
   profCardNumber?: string;
@@ -219,8 +256,12 @@ export class CreatePersonDto {
 
   @IsOptional()
   @IsString()
+  @Matches(/^[A-Z]{2}$|^$/, {
+    message: 'State must be 2 uppercase letters or empty',
+  })
   profCardState?: string;
 
+  // Military Documents
   @IsOptional()
   @IsString()
   militaryRegistration?: string;
@@ -233,7 +274,7 @@ export class CreatePersonDto {
   @IsString()
   militaryReserveNumber?: string;
 
-  // Income (Tab 6)
+  // Income
   @IsOptional()
   @IsNumber()
   incomeTypeId?: number;
@@ -246,7 +287,7 @@ export class CreatePersonDto {
   @IsNumber()
   annualIncome?: number;
 
-  // Education (Tab 7)
+  // Education
   @IsOptional()
   @IsNumber()
   educationLevelId?: number;
@@ -283,13 +324,5 @@ export class CreatePersonDto {
   // System
   @IsOptional()
   @IsNumber()
-  createdUnitId?: number;
-
-  @IsOptional()
-  @IsNumber()
-  referredUnitId?: number;
-
-  @IsOptional()
-  @IsString()
-  notes?: string;
+  updatedBy?: number;
 }

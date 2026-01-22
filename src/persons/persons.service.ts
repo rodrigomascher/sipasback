@@ -22,7 +22,7 @@ export class PersonsService {
    */
   async findAll(paginationQuery: PaginationQueryDto): Promise<PaginatedResponseDto<any>> {
     const query =
-      'id, created_at, updated_at, created_by, updated_by, first_name, last_name, birth_date, gender_id, gender_identity_id, cpf';
+      'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, social_name, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
 
     const offset = paginationQuery.getOffset();
 
@@ -144,15 +144,39 @@ export class PersonsService {
 
   /**
    * Convert DTO to database format (camelCase to snake_case)
+   * Filters out null/undefined values and empty strings for numeric fields
    */
   private dtoToData(
     dto: CreatePersonDto | UpdatePersonDto,
   ): Record<string, any> {
     const data: Record<string, any> = {};
+    const numericFields = new Set([
+      'sex', 'genderId', 'genderIdentityId', 'raceId', 'ethnicityId', 'communityId',
+      'maritalStatusId', 'nationality', 'originCountryId', 'motherPersonId', 'fatherPersonId',
+      'motherResidenceOrder', 'fatherResidenceOrder', 'nis', 'susNumber', 'rgIssuingOrgId',
+      'photoId', 'certStandardNew', 'certPage', 'voterIdZone', 'voterIdSection', 'profCardNumber',
+      'incomeTypeId', 'monthlyIncome', 'annualIncome', 'educationLevelId', 'completionYear',
+      'currentlyStudying', 'deceased', 'createdUnitId', 'updatedUnitId', 'referredUnitId',
+    ]);
 
     Object.keys(dto).forEach((key) => {
+      const value = (dto as any)[key];
+      
+      // Skip undefined and null values
+      if (value === undefined || value === null) {
+        return;
+      }
+      
+      // Skip empty strings, especially for numeric fields
+      if (value === '') {
+        if (numericFields.has(key)) {
+          return; // Skip numeric fields with empty strings
+        }
+        // Allow empty strings for text fields (will be stored as empty string or converted to null by DB)
+      }
+      
       const snakeKey = this.camelToSnake(key);
-      data[snakeKey] = (dto as any)[key];
+      data[snakeKey] = value;
     });
 
     return data;
