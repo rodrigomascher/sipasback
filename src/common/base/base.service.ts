@@ -92,7 +92,15 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
       data.updated_by = userId;
     }
 
-    const result = await this.supabaseService.insert<T>(this.tableName, data);
+    // Filter out undefined values to avoid schema cache issues
+    const filteredData = Object.fromEntries(
+      Object.entries(data).filter(([, value]) => value !== undefined),
+    );
+
+    const result = await this.supabaseService.insert<T>(
+      this.tableName,
+      filteredData,
+    );
 
     if (!result || result.length === 0) {
       throw new Error(`Failed to create ${this.tableName}`);
@@ -115,9 +123,18 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
       data.updated_by = userId;
     }
 
-    const result = await this.supabaseService.update<T>(this.tableName, data, {
-      id,
-    });
+    // Filter out undefined values to avoid schema cache issues
+    const filteredData = Object.fromEntries(
+      Object.entries(data).filter(([, value]) => value !== undefined),
+    );
+
+    const result = await this.supabaseService.update<T>(
+      this.tableName,
+      filteredData,
+      {
+        id,
+      },
+    );
 
     if (!result || result.length === 0) {
       throw new Error(`Failed to update ${this.tableName}`);
