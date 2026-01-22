@@ -2,30 +2,11 @@ import { Injectable, BadRequestException, NotFoundException } from '@nestjs/comm
 import { SupabaseService } from '../database/supabase.service';
 import { CreateFamilyCompositionDto, UpdateFamilyCompositionDto, FamilyCompositionDto } from './dto/family-composition.dto';
 import { PaginatedResponseDto, PaginationQueryDto } from '../common/dto/paginated-response.dto';
+import { toCamelCase, toSnakeCase } from '../common/utils/transform.utils';
 
 @Injectable()
 export class FamilyCompositionService {
   constructor(private supabaseService: SupabaseService) {}
-
-  private toSnakeCase(obj: any): any {
-    if (!obj) return obj;
-    const result: any = {};
-    for (const [key, value] of Object.entries(obj)) {
-      const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-      result[snakeKey] = value;
-    }
-    return result;
-  }
-
-  private toCamelCase(obj: any): any {
-    if (!obj) return obj;
-    const result: any = {};
-    for (const [key, value] of Object.entries(obj)) {
-      const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
-      result[camelKey] = value;
-    }
-    return result;
-  }
 
   // Validation: Check if person is not in another family
   private async validatePersonNotInOtherFamily(
@@ -48,13 +29,13 @@ export class FamilyCompositionService {
   async create(dto: CreateFamilyCompositionDto): Promise<FamilyCompositionDto | null> {
     await this.validatePersonNotInOtherFamily(dto.idPerson, dto.idFamilyComposition);
 
-    const snakeCaseData = this.toSnakeCase({
+    const snakeCaseData = toSnakeCase({
       ...dto,
       createdAt: new Date(),
     });
 
     const result = await this.supabaseService.insert('family_composition', snakeCaseData);
-    return result?.[0] ? this.toCamelCase(result[0]) : null;
+    return result?.[0] ? toCamelCase(result[0]) : null;
   }
 
   async findAll(paginationQuery: PaginationQueryDto): Promise<PaginatedResponseDto<any>> {
@@ -72,7 +53,7 @@ export class FamilyCompositionService {
       offset
     );
 
-    const mappedData = data?.map(item => this.toCamelCase(item)) || [];
+    const mappedData = data?.map(item => toCamelCase(item)) || [];
     return new PaginatedResponseDto(mappedData, count || 0, paginationQuery.page, paginationQuery.pageSize);
   }
 
@@ -87,7 +68,7 @@ export class FamilyCompositionService {
       throw new NotFoundException(`Family with ID ${idFamilyComposition} not found`);
     }
 
-    return result.map((item) => this.toCamelCase(item));
+    return result.map((item) => toCamelCase(item));
   }
 
   async findOne(idFamilyComposition: number, idPerson: number): Promise<FamilyCompositionDto> {
@@ -101,7 +82,7 @@ export class FamilyCompositionService {
       throw new NotFoundException('Family composition not found');
     }
 
-    return this.toCamelCase(result[0]);
+    return toCamelCase(result[0]);
   }
 
   async update(
@@ -111,7 +92,7 @@ export class FamilyCompositionService {
   ): Promise<FamilyCompositionDto | null> {
     await this.findOne(idFamilyComposition, idPerson);
 
-    const snakeCaseData = this.toSnakeCase({
+    const snakeCaseData = toSnakeCase({
       ...dto,
       updatedAt: new Date(),
     });
@@ -122,7 +103,7 @@ export class FamilyCompositionService {
       { id_family_composition: idFamilyComposition, id_person: idPerson }
     );
 
-    return result?.[0] ? this.toCamelCase(result[0]) : null;
+    return result?.[0] ? toCamelCase(result[0]) : null;
   }
 
   async remove(idFamilyComposition: number, idPerson: number): Promise<void> {

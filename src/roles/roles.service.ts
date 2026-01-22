@@ -2,20 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import { CreateRoleDto, UpdateRoleDto, RoleDto } from './dto/role.dto';
 import { PaginatedResponseDto, PaginationQueryDto } from '../common/dto/paginated-response.dto';
+import { toCamelCase } from '../common/utils/transform.utils';
 
 @Injectable()
 export class RolesService {
   constructor(private supabaseService: SupabaseService) {}
-
-  private toCamelCase(obj: any): any {
-    if (!obj) return obj;
-    const result: any = {};
-    for (const [key, value] of Object.entries(obj)) {
-      const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
-      result[camelKey] = value;
-    }
-    return result;
-  }
 
   /**
    * Get all roles with pagination
@@ -35,7 +26,7 @@ export class RolesService {
       offset
     );
 
-    const mappedData = data?.map(item => this.toCamelCase(item)) || [];
+    const mappedData = data?.map(item => toCamelCase(item)) || [];
     return new PaginatedResponseDto(mappedData, count || 0, paginationQuery.page, paginationQuery.pageSize);
   }
 

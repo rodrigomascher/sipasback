@@ -3,35 +3,16 @@ import { SupabaseService } from '../database/supabase.service';
 import { CreateSexualOrientationDto } from './dto/create-sexual-orientation.dto';
 import { UpdateSexualOrientationDto } from './dto/update-sexual-orientation.dto';
 import { PaginatedResponseDto, PaginationQueryDto } from '../common/dto/paginated-response.dto';
+import { toCamelCase, toSnakeCase } from '../common/utils/transform.utils';
 
 @Injectable()
 export class SexualOrientationsService {
   constructor(private supabaseService: SupabaseService) {}
 
-  private toSnakeCase(obj: any): any {
-    if (!obj) return obj;
-    const result: any = {};
-    for (const [key, value] of Object.entries(obj)) {
-      const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-      result[snakeKey] = value;
-    }
-    return result;
-  }
-
-  private toCamelCase(obj: any): any {
-    if (!obj) return obj;
-    const result: any = {};
-    for (const [key, value] of Object.entries(obj)) {
-      const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
-      result[camelKey] = value;
-    }
-    return result;
-  }
-
   async create(createSexualOrientationDto: CreateSexualOrientationDto) {
-    const snakeCaseData = this.toSnakeCase(createSexualOrientationDto);
+    const snakeCaseData = toSnakeCase(createSexualOrientationDto);
     const result = await this.supabaseService.insert('sexual_orientation', snakeCaseData);
-    return result?.[0] ? this.toCamelCase(result[0]) : null;
+    return result?.[0] ? toCamelCase(result[0]) : null;
   }
 
   async findAll(paginationQuery: PaginationQueryDto): Promise<PaginatedResponseDto<any>> {
@@ -49,7 +30,7 @@ export class SexualOrientationsService {
       offset
     );
 
-    const mappedData = data?.map(item => this.toCamelCase(item)) || [];
+    const mappedData = data?.map(item => toCamelCase(item)) || [];
     return new PaginatedResponseDto(mappedData, count || 0, paginationQuery.page, paginationQuery.pageSize);
   }
 
@@ -59,13 +40,13 @@ export class SexualOrientationsService {
       'id, description, active, created_by, updated_by, created_at, updated_at',
       { id }
     );
-    return result?.[0] ? this.toCamelCase(result[0]) : null;
+    return result?.[0] ? toCamelCase(result[0]) : null;
   }
 
   async update(id: number, updateSexualOrientationDto: UpdateSexualOrientationDto) {
-    const snakeCaseData = this.toSnakeCase(updateSexualOrientationDto);
+    const snakeCaseData = toSnakeCase(updateSexualOrientationDto);
     const result = await this.supabaseService.update('sexual_orientation', snakeCaseData, { id });
-    return result?.[0] ? this.toCamelCase(result[0]) : null;
+    return result?.[0] ? toCamelCase(result[0]) : null;
   }
 
   async remove(id: number) {
