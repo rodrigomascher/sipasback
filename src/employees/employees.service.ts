@@ -1,206 +1,77 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import {
   CreateEmployeeDto,
   UpdateEmployeeDto,
-  EmployeeDto,
 } from './dto/employee.dto';
-import {
-  PaginatedResponseDto,
-  PaginationQueryDto,
-} from '../common/dto/paginated-response.dto';
-import { toCamelCase } from '../common/utils/transform.utils';
+import { toCamelCase, toSnakeCase } from '../common/utils/transform.utils';
 import { Employee } from '../common/types/database.types';
+import { BaseService } from '../common/base/base.service';
 
 @Injectable()
-export class EmployeesService {
-  constructor(private supabaseService: SupabaseService) {}
+export class EmployeesService extends BaseService<
+  Employee,
+  CreateEmployeeDto,
+  UpdateEmployeeDto
+> {
+  protected tableName = 'employees';
+  protected columns =
+    'id, employee_id, full_name, unit_id, department_id, role_id, is_technician, created_by, updated_by, created_at, updated_at';
 
-  /**
-   * Get all employees with pagination
-   */
-  async findAll(
-    paginationQuery: PaginationQueryDto,
-  ): Promise<PaginatedResponseDto<any>> {
-    const columns =
-      'id, employee_id, full_name, unit_id, department_id, role_id, is_technician, created_by, updated_by, created_at, updated_at';
-    const offset = paginationQuery.getOffset();
-
-    // Get paginated data with count
-    const { data, count } =
-      await this.supabaseService.selectWithCount<Employee>(
-        'employees',
-        columns,
-        {},
-        paginationQuery.sortBy,
-        paginationQuery.sortDirection,
-        paginationQuery.pageSize,
-        offset,
-      );
-
-    const mappedData = data?.map((item) => toCamelCase(item)) || [];
-    return new PaginatedResponseDto(
-      mappedData,
-      count || 0,
-      paginationQuery.page,
-      paginationQuery.pageSize,
-    );
+  constructor(supabaseService: SupabaseService) {
+    super(supabaseService);
   }
 
-  /**
-   * Get employee by ID
-   */
-  async findOne(id: number): Promise<EmployeeDto> {
-    const employees = await this.supabaseService.select<Employee>(
-      'employees',
-      'id, employee_id, full_name, unit_id, department_id, role_id, is_technician, created_by, updated_by, created_at, updated_at',
-      { id },
-    );
+  protected mapData(data: Employee): any {
+    return toCamelCase(data);
+  }
 
-    if (!employees || employees.length === 0) {
-      throw new NotFoundException(`Employee with ID ${id} not found`);
-    }
-
-    return this.mapToEmployeeDto(employees[0]);
+  protected transformForDb(
+    dto: CreateEmployeeDto | UpdateEmployeeDto,
+  ): any {
+    return toSnakeCase(dto);
   }
 
   /**
    * Find employees by unit ID
    */
-  async findByUnitId(unitId: number): Promise<EmployeeDto[]> {
+  async findByUnitId(unitId: number): Promise<any[]> {
     const employees = await this.supabaseService.select<Employee>(
-      'employees',
-      'id, employee_id, full_name, unit_id, department_id, role_id, is_technician, created_by, updated_by, created_at, updated_at',
+      this.tableName,
+      this.columns,
       { unit_id: unitId },
     );
-
-    return (employees || []).map((emp) => this.mapToEmployeeDto(emp));
+    return (employees || []).map((e) => this.mapData(e));
   }
 
   /**
    * Find employees by department ID
    */
-  async findByDepartmentId(departmentId: number): Promise<EmployeeDto[]> {
+  async findByDepartmentId(departmentId: number): Promise<any[]> {
     const employees = await this.supabaseService.select<Employee>(
-      'employees',
-      'id, employee_id, full_name, unit_id, department_id, role_id, is_technician, created_by, updated_by, created_at, updated_at',
+      this.tableName,
+      this.columns,
       { department_id: departmentId },
     );
-
-    return (employees || []).map((emp) => this.mapToEmployeeDto(emp));
+    return (employees || []).map((e) => this.mapData(e));
   }
 
   /**
    * Find employees by role ID
    */
-  async findByRoleId(roleId: number): Promise<EmployeeDto[]> {
+  async findByRoleId(roleId: number): Promise<any[]> {
     const employees = await this.supabaseService.select<Employee>(
-      'employees',
-      'id, employee_id, full_name, unit_id, department_id, role_id, is_technician, created_by, updated_by, created_at, updated_at',
+      this.tableName,
+      this.columns,
       { role_id: roleId },
     );
-
-    return (employees || []).map((emp) => this.mapToEmployeeDto(emp));
+    return (employees || []).map((e) => this.mapData(e));
   }
 
   /**
-   * Create new employee
-   */
-  async create(
-    createEmployeeDto: CreateEmployeeDto,
-    userId: number,
-  ): Promise<EmployeeDto> {
-    const data = {
-      employee_id: createEmployeeDto.employeeId,
-      full_name: createEmployeeDto.fullName,
-      unit_id: createEmployeeDto.unitId,
-      department_id: createEmployeeDto.departmentId,
-      role_id: createEmployeeDto.roleId || null,
-      is_technician: createEmployeeDto.isTechnician || false,
-      created_by: userId,
-      updated_by: userId,
-    };
-
-    const result = await this.supabaseService.insert<Employee>(
-      'employees',
-      data,
-    );
-
-    if (!result || result.length === 0) {
-      throw new Error('Failed to create employee');
-    }
-
-    return this.mapToEmployeeDto(result[0]);
-  }
-
-  /**
-   * Update employee
-   */
-  async update(
-    id: number,
-    updateEmployeeDto: UpdateEmployeeDto,
-    userId: number,
-  ): Promise<EmployeeDto> {
-    // First verify employee exists
-    await this.findOne(id);
-
-    const data: Partial<Employee> = {};
-    if (updateEmployeeDto.employeeId)
-      data.employee_id = updateEmployeeDto.employeeId;
-    if (updateEmployeeDto.fullName) data.full_name = updateEmployeeDto.fullName;
-    if (updateEmployeeDto.unitId) data.unit_id = updateEmployeeDto.unitId;
-    if (updateEmployeeDto.departmentId)
-      data.department_id = updateEmployeeDto.departmentId;
-    if (updateEmployeeDto.roleId !== undefined)
-      data.role_id = updateEmployeeDto.roleId;
-    if (updateEmployeeDto.isTechnician !== undefined)
-      data.is_technician = updateEmployeeDto.isTechnician;
-    data.updated_by = userId;
-
-    const result = await this.supabaseService.update<Employee>(
-      'employees',
-      data,
-      { id },
-    );
-
-    if (!result || result.length === 0) {
-      throw new Error('Failed to update employee');
-    }
-
-    return this.mapToEmployeeDto(result[0]);
-  }
-
-  /**
-   * Delete employee
-   */
-  async remove(id: number): Promise<void> {
-    await this.findOne(id); // Verify exists first
-    await this.supabaseService.delete('employees', { id });
-  }
-
-  /**
-   * Get total count of employees
+   * Count total employees
    */
   async count(): Promise<number> {
-    return this.supabaseService.count('employees');
-  }
-
-  /**
-   * Helper to map database response to DTO
-   */
-  private mapToEmployeeDto(employee: Employee): EmployeeDto {
-    return {
-      id: employee.id,
-      employeeId: employee.employee_id ? String(employee.employee_id) : '',
-      fullName: employee.full_name || '',
-      unitId: employee.unit_id || 0,
-      departmentId: employee.department_id || 0,
-      roleId: employee.role_id || null,
-      isTechnician: employee.is_technician || false,
-      createdBy: employee.created_by || null,
-      updatedBy: employee.updated_by || null,
-      createdAt: employee.created_at,
-      updatedAt: employee.updated_at,
-    };
+    return this.supabaseService.count(this.tableName);
   }
 }

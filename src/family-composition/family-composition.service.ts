@@ -1,32 +1,49 @@
 import {
   Injectable,
   BadRequestException,
-  NotFoundException,
 } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import {
   CreateFamilyCompositionDto,
   UpdateFamilyCompositionDto,
-  FamilyCompositionDto,
 } from './dto/family-composition.dto';
-import {
-  PaginatedResponseDto,
-  PaginationQueryDto,
-} from '../common/dto/paginated-response.dto';
 import { toCamelCase, toSnakeCase } from '../common/utils/transform.utils';
 import { FamilyComposition } from '../common/types/database.types';
+import { BaseService } from '../common/base/base.service';
 
 @Injectable()
-export class FamilyCompositionService {
-  constructor(private supabaseService: SupabaseService) {}
+export class FamilyCompositionService extends BaseService<
+  FamilyComposition,
+  CreateFamilyCompositionDto,
+  UpdateFamilyCompositionDto
+> {
+  protected tableName = 'family_composition';
+  protected columns =
+    'id_family_composition, id_person, id_relationship_degree, responsible, registration_date, created_by, created_at, updated_by, updated_at';
 
-  // Validation: Check if person is not in another family
+  constructor(supabaseService: SupabaseService) {
+    super(supabaseService);
+  }
+
+  protected mapData(data: FamilyComposition): any {
+    return toCamelCase(data);
+  }
+
+  protected transformForDb(
+    dto: CreateFamilyCompositionDto | UpdateFamilyCompositionDto,
+  ): any {
+    return toSnakeCase(dto);
+  }
+
+  /**
+   * Validation: Check if person is not in another family
+   */
   private async validatePersonNotInOtherFamily(
     idPerson: number,
     idFamilyComposition: number,
   ): Promise<void> {
     const existing = await this.supabaseService.select<FamilyComposition>(
-      'family_composition',
+      this.tableName,
       '*',
       { id_person: idPerson },
     );
@@ -42,116 +59,28 @@ export class FamilyCompositionService {
     }
   }
 
+  /**
+   * Override create to add validation
+   */
   async create(
     dto: CreateFamilyCompositionDto,
-  ): Promise<FamilyCompositionDto | null> {
+  ): Promise<any> {
     await this.validatePersonNotInOtherFamily(
       dto.idPerson,
       dto.idFamilyComposition,
     );
-
-    const snakeCaseData = toSnakeCase({
-      ...dto,
-      createdAt: new Date(),
-    });
-
-    const result = await this.supabaseService.insert<FamilyComposition>(
-      'family_composition',
-      snakeCaseData,
-    );
-    return result?.[0] ? toCamelCase(result[0]) : null;
+    return super.create(dto);
   }
 
-  async findAll(
-    paginationQuery: PaginationQueryDto,
-  ): Promise<PaginatedResponseDto<any>> {
-    const columns =
-      'id_family_composition, id_person, id_relationship_degree, responsible, registration_date, created_by, created_at, updated_by, updated_at';
-    const offset = paginationQuery.getOffset();
-
-    // Get paginated data with count
-    const { data, count } =
-      await this.supabaseService.selectWithCount<FamilyComposition>(
-        'family_composition',
-        columns,
-        {},
-        paginationQuery.sortBy,
-        paginationQuery.sortDirection,
-        paginationQuery.pageSize,
-        offset,
-      );
-
-    const mappedData = data?.map((item) => toCamelCase(item)) || [];
-    return new PaginatedResponseDto(
-      mappedData,
-      count || 0,
-      paginationQuery.page,
-      paginationQuery.pageSize,
-    );
-  }
-
-  async findByFamily(
-    idFamilyComposition: number,
-  ): Promise<FamilyCompositionDto[]> {
+  /**
+   * Find by family ID
+   */
+  async findByFamily(idFamilyComposition: number): Promise<any[]> {
     const result = await this.supabaseService.select<FamilyComposition>(
-      'family_composition',
-      'id_family_composition, id_person, id_relationship_degree, responsible, registration_date, created_by, created_at, updated_by, updated_at',
+      this.tableName,
+      this.columns,
       { id_family_composition: idFamilyComposition },
     );
-
-    if (!result || result.length === 0) {
-      throw new NotFoundException(
-        `Family with ID ${idFamilyComposition} not found`,
-      );
-    }
-
-    return result.map((item) => toCamelCase(item));
-  }
-
-  async findOne(
-    idFamilyComposition: number,
-    idPerson: number,
-  ): Promise<FamilyCompositionDto> {
-    const result = await this.supabaseService.select<FamilyComposition>(
-      'family_composition',
-      'id_family_composition, id_person, id_relationship_degree, responsible, registration_date, created_by, created_at, updated_by, updated_at',
-      { id_family_composition: idFamilyComposition, id_person: idPerson },
-    );
-
-    if (!result || result.length === 0) {
-      throw new NotFoundException('Family composition not found');
-    }
-
-    return toCamelCase(result[0]);
-  }
-
-  async update(
-    idFamilyComposition: number,
-    idPerson: number,
-    dto: UpdateFamilyCompositionDto,
-  ): Promise<FamilyCompositionDto | null> {
-    await this.findOne(idFamilyComposition, idPerson);
-
-    const snakeCaseData = toSnakeCase({
-      ...dto,
-      updatedAt: new Date(),
-    });
-
-    const result = await this.supabaseService.update<FamilyComposition>(
-      'family_composition',
-      snakeCaseData,
-      { id_family_composition: idFamilyComposition, id_person: idPerson },
-    );
-
-    return result?.[0] ? toCamelCase(result[0]) : null;
-  }
-
-  async remove(idFamilyComposition: number, idPerson: number): Promise<void> {
-    await this.findOne(idFamilyComposition, idPerson);
-
-    await this.supabaseService.delete('family_composition', {
-      id_family_composition: idFamilyComposition,
-      id_person: idPerson,
-    });
+    return (result || []).map((r) => this.mapData(r));
   }
 }
