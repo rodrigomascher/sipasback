@@ -12,10 +12,7 @@ export class SexualOrientationsController extends BaseController<
   CreateSexualOrientationDto,
   UpdateSexualOrientationDto
 > {
-  protected service: SexualOrientationsService;
-
   constructor(sexualOrientationsService: SexualOrientationsService) {
-    super();
-    this.service = sexualOrientationsService;
+    super(sexualOrientationsService);
   }
 }

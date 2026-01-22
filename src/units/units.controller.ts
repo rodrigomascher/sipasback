@@ -1,198 +1,37 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Delete,
-  Param,
-  Query,
-  HttpCode,
-  HttpStatus,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { Controller, Get, Param } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { ApiCrudOperation } from '../common/decorators/api-crud.decorator';
 import { UnitsService } from './units.service';
-import { CreateUnitDto, UpdateUnitDto, UnitDto } from './dto/unit.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { GetUser } from '../common/decorators/get-user.decorator';
-import { PaginationQueryDto } from '../common/dto/paginated-response.dto';
-import type { UserSession } from '../auth/auth.service';
+import { CreateUnitDto, UpdateUnitDto } from './dto/unit.dto';
+import { BaseController } from '../common/base/base.controller';
 
 @ApiTags('units')
 @Controller('units')
-export class UnitsController {
-  constructor(private readonly unitsService: UnitsService) {}
-
-  @Get()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'List all organizational units' })
-  @ApiResponse({
-    status: 200,
-    description: 'List of units',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
-  async findAll(
-    @Query('page') page?: string,
-    @Query('pageSize') pageSize?: string,
-    @Query('sortBy') sortBy?: string,
-    @Query('sortDirection') sortDirection?: string,
-  ) {
-    const paginationQuery = new PaginationQueryDto({
-      page: page ? parseInt(page, 10) : 1,
-      pageSize: pageSize ? parseInt(pageSize, 10) : 10,
-      sortBy,
-      sortDirection: sortDirection as 'asc' | 'desc' | undefined,
-    });
-    return this.unitsService.findAll(paginationQuery);
+export class UnitsController extends BaseController<
+  any,
+  CreateUnitDto,
+  UpdateUnitDto
+> {
+  constructor(unitsService: UnitsService) {
+    super(unitsService);
   }
 
   @Get('search/city/:city')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Find units by city' })
-  @ApiResponse({
-    status: 200,
-    description: 'Units found in city',
-    type: [UnitDto],
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
+  @ApiCrudOperation('Find units by city')
   async findByCity(@Param('city') city: string) {
-    return this.unitsService.findByCity(city);
+    return this.service.findByCity(city);
   }
 
   @Get('search/state/:state')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Find units by state' })
-  @ApiResponse({
-    status: 200,
-    description: 'Units found in state',
-    type: [UnitDto],
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
+  @ApiCrudOperation('Find units by state')
   async findByState(@Param('state') state: string) {
-    return this.unitsService.findByState(state.toUpperCase());
+    return this.service.findByState(state.toUpperCase());
   }
 
   @Get('count')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Count total units' })
-  @ApiResponse({
-    status: 200,
-    description: 'Total count of units',
-    schema: { type: 'object', properties: { count: { type: 'number' } } },
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
+  @ApiCrudOperation('Count total units')
   async count() {
-    const count = await this.unitsService.count();
+    const count = await this.service.count();
     return { count };
-  }
-
-  @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get unit by ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Unit details',
-    type: UnitDto,
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Unit not found',
-  })
-  async findOne(@Param('id') id: string) {
-    return this.unitsService.findOne(Number(id));
-  }
-
-  @Post()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create new organizational unit' })
-  @ApiResponse({
-    status: 201,
-    description: 'Unit created successfully',
-    type: UnitDto,
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
-  async create(
-    @GetUser() user: UserSession,
-    @Body() createUnitDto: CreateUnitDto,
-  ) {
-    return this.unitsService.create(createUnitDto, user.id);
-  }
-
-  @Patch(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update organizational unit' })
-  @ApiResponse({
-    status: 200,
-    description: 'Unit updated successfully',
-    type: UnitDto,
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Unit not found',
-  })
-  async update(
-    @GetUser() user: UserSession,
-    @Param('id') id: string,
-    @Body() updateUnitDto: UpdateUnitDto,
-  ) {
-    return this.unitsService.update(Number(id), updateUnitDto, user.id);
-  }
-
-  @Delete(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete organizational unit' })
-  @ApiResponse({
-    status: 204,
-    description: 'Unit deleted successfully',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Unit not found',
-  })
-  async remove(@Param('id') id: string) {
-    await this.unitsService.remove(Number(id));
   }
 }

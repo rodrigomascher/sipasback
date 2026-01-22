@@ -10,10 +10,7 @@ export class UsersController extends BaseController<
   CreateUserDto,
   UpdateUserDto
 > {
-  protected service: UsersService;
-
   constructor(usersService: UsersService) {
-    super();
-    this.service = usersService;
+    super(usersService);
   }
 }

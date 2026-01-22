@@ -12,10 +12,7 @@ export class GenderIdentitiesController extends BaseController<
   CreateGenderIdentityDto,
   UpdateGenderIdentityDto
 > {
-  protected service: GenderIdentitiesService;
-
   constructor(genderIdentitiesService: GenderIdentitiesService) {
-    super();
-    this.service = genderIdentitiesService;
+    super(genderIdentitiesService);
   }
 }

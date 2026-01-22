@@ -12,10 +12,7 @@ export class RelationshipDegreesController extends BaseController<
   CreateRelationshipDegreeDto,
   UpdateRelationshipDegreeDto
 > {
-  protected service: RelationshipDegreesService;
-
   constructor(relationshipDegreesService: RelationshipDegreesService) {
-    super();
-    this.service = relationshipDegreesService;
+    super(relationshipDegreesService);
   }
 }
