@@ -1,8 +1,9 @@
-import { Controller, Post, Put, Body, Param } from '@nestjs/common';
+import { Controller, Post, Put, Get, Body, Param, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UsersService, CreateUserDto, UpdateUserDto } from './users.service';
 import { BaseController } from '../common/base/base.controller';
 import { GetUser } from '../common/decorators/get-user.decorator';
+import { PaginationQueryBuilder } from '../common/utils/pagination.builder';
 
 @ApiTags('users')
 @Controller('users')
@@ -13,6 +14,29 @@ export class UsersController extends BaseController<
 > {
   constructor(private usersService: UsersService) {
     super(usersService);
+  }
+
+  @Get()
+  async findAll(
+    @Query('page') page?: string | number,
+    @Query('pageSize') pageSize?: string | number,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortDirection') sortDirection?: 'asc' | 'desc',
+    @Query('search') search?: string,
+  ): Promise<any> {
+    const paginationQuery = PaginationQueryBuilder.fromQuery({
+      page,
+      pageSize,
+      sortBy,
+      sortDirection,
+      search,
+    });
+    return this.usersService.findAllWithUnits(paginationQuery);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<any> {
+    return this.usersService.findOneWithUnits(parseInt(id, 10));
   }
 
   @Post()

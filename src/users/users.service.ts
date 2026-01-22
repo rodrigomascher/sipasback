@@ -135,5 +135,26 @@ export class UsersService extends BaseService<
     user.units = await this.userUnitsService.getUnitsForUser(id);
     return user;
   }
+
+  /**
+   * Find all users with their units (overrides base findAll)
+   */
+  async findAllWithUnits(paginationQuery: any): Promise<any> {
+    // Call base findAll to get paginated results
+    const paginatedResult = await super.findAll(paginationQuery);
+    
+    // Fetch units for each user
+    const dataWithUnits = await Promise.all(
+      paginatedResult.data.map(async (user: any) => ({
+        ...user,
+        units: await this.userUnitsService.getUnitsForUser(user.id),
+      }))
+    );
+
+    return {
+      ...paginatedResult,
+      data: dataWithUnits,
+    };
+  }
 }
 
