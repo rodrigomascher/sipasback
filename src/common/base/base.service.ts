@@ -95,7 +95,7 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
     // Filter out undefined values to avoid schema cache issues
     const filteredData = Object.fromEntries(
       Object.entries(data).filter(([, value]) => value !== undefined),
-    );
+    ) as Partial<T>;
 
     const result = await this.supabaseService.insert<T>(
       this.tableName,
@@ -126,7 +126,7 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
     // Filter out undefined values to avoid schema cache issues
     const filteredData = Object.fromEntries(
       Object.entries(data).filter(([, value]) => value !== undefined),
-    );
+    ) as Partial<T>;
 
     const result = await this.supabaseService.update<T>(
       this.tableName,
