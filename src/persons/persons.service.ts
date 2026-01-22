@@ -53,7 +53,7 @@ export class PersonsService {
       return [];
     }
 
-    const query = 'id, first_name, last_name, cpf, birth_date';
+    const query = 'id, first_name, last_name, cpf, nis, nisn, birth_date';
     const persons = await this.supabaseService.select('person', query, {});
 
     // Client-side filtering since Supabase doesn't support OR easily
@@ -63,7 +63,9 @@ export class PersonsService {
         (p: any) =>
           p.first_name?.toLowerCase().includes(term) ||
           p.last_name?.toLowerCase().includes(term) ||
-          p.cpf?.includes(searchTerm),
+          p.cpf?.includes(searchTerm) ||
+          p.nis?.includes(searchTerm) ||
+          p.nisn?.includes(searchTerm),
       )
       .map((p) => this.mapPerson(p));
   }
@@ -73,7 +75,7 @@ export class PersonsService {
    */
   async findOne(id: number): Promise<Person> {
     const query =
-      'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, nickname, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
+      'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, social_name, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
 
     const persons = await this.supabaseService.select('person', query, { id });
 
@@ -88,8 +90,8 @@ export class PersonsService {
    * Create a new person
    */
   async create(createPersonDto: CreatePersonDto, userId: number): Promise<Person> {
-    // Check for duplicate CPF if provided
-    if (createPersonDto.cpf) {
+    // Check for duplicate CPF if provided and not empty
+    if (createPersonDto.cpf && createPersonDto.cpf.trim() !== '') {
       const existing = await this.supabaseService.select('person', 'id', {
         cpf: createPersonDto.cpf,
       });
@@ -148,6 +150,7 @@ export class PersonsService {
   /**
    * Convert DTO to database format (camelCase to snake_case)
    * Filters out null/undefined values and empty strings for numeric and date fields
+   * Converts empty strings for unique constraint fields (like CPF) to NULL
    */
   private dtoToData(
     dto: CreatePersonDto | UpdatePersonDto,
@@ -167,6 +170,9 @@ export class PersonsService {
       'birthDate', 'arrivalDateBrazil', 'rgIssuanceDate', 'certIssuanceDate',
       'voterIdIssuanceDate', 'profCardIssuanceDate', 'militaryIssuanceDate', 'deathCertIssuanceDate',
     ]);
+    
+    // Fields with unique constraints that should be NULL when empty
+    const uniqueConstraintFields = new Set(['cpf', 'nis', 'nisn']);
 
     Object.keys(dto).forEach((key) => {
       const value = (dto as any)[key];
@@ -176,11 +182,19 @@ export class PersonsService {
         return;
       }
       
-      // Skip empty strings for numeric and date fields
-      if (value === '') {
+      // Handle empty strings
+      if (value === '' || value === '') {
         if (numericFields.has(key) || dateFields.has(key)) {
           return; // Skip numeric and date fields with empty strings
         }
+        
+        // Convert empty strings to NULL for unique constraint fields
+        if (uniqueConstraintFields.has(key)) {
+          const snakeKey = this.camelToSnake(key);
+          data[snakeKey] = null;
+          return;
+        }
+        
         // Allow empty strings for text fields (will be stored as empty string or converted to null by DB)
       }
       

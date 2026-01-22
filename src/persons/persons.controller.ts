@@ -70,7 +70,7 @@ export class PersonsController {
     @Body() createPersonDto: CreatePersonDto,
     @Request() req: any,
   ): Promise<Person> {
-    const userId = req.user.sub; // Extract user ID from JWT token
+    const userId = req.user.userId; // Extract user ID from JWT token
     return this.personsService.create(createPersonDto, userId);
   }
 
@@ -85,7 +85,7 @@ export class PersonsController {
     @Body() updatePersonDto: UpdatePersonDto,
     @Request() req: any,
   ): Promise<Person> {
-    const userId = req.user.sub; // Extract user ID from JWT token
+    const userId = req.user.userId; // Extract user ID from JWT token
     return this.personsService.update(parseInt(id, 10), updatePersonDto, userId);
   }
 
