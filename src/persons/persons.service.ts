@@ -145,11 +145,16 @@ export class PersonsService {
   /**
    * Convert DTO to database format (camelCase to snake_case)
    * Filters out null/undefined values and empty strings for numeric and date fields
+   * but preserves required fields like createdBy and updatedBy
    */
   private dtoToData(
     dto: CreatePersonDto | UpdatePersonDto,
   ): Record<string, any> {
     const data: Record<string, any> = {};
+    
+    // Required fields that should never be filtered out
+    const requiredFields = new Set(['createdBy', 'updatedBy']);
+    
     const numericFields = new Set([
       'sex', 'genderId', 'genderIdentityId', 'raceId', 'ethnicityId', 'communityId',
       'maritalStatusId', 'nationality', 'originCountryId', 'motherPersonId', 'fatherPersonId',
@@ -167,7 +172,17 @@ export class PersonsService {
     Object.keys(dto).forEach((key) => {
       const value = (dto as any)[key];
       
-      // Skip undefined and null values
+      // For required fields, only skip if they're explicitly null/undefined
+      if (requiredFields.has(key)) {
+        if (value === null || value === undefined) {
+          throw new Error(`Required field "${key}" cannot be null or undefined`);
+        }
+        const snakeKey = this.camelToSnake(key);
+        data[snakeKey] = value;
+        return;
+      }
+      
+      // Skip undefined and null values for optional fields
       if (value === undefined || value === null) {
         return;
       }
