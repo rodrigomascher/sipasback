@@ -136,7 +136,12 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
    * Get total count of items
    */
   async count(): Promise<number> {
-    return this.supabaseService.count(this.tableName);
+    const { count } = await this.supabaseService.selectWithCount(
+      this.tableName,
+      'id',
+      {},
+    );
+    return count || 0;
   }
 
   /**

@@ -68,10 +68,5 @@ export class EmployeesService extends BaseService<
     return (employees || []).map((e) => this.mapData(e));
   }
 
-  /**
-   * Count total employees
-   */
-  async count(): Promise<number> {
-    return this.supabaseService.count(this.tableName);
-  }
+
 }

@@ -58,10 +58,5 @@ export class UnitsService extends BaseService<
     return (units || []).map((u) => this.mapData(u));
   }
 
-  /**
-   * Count total units
-   */
-  async count(): Promise<number> {
-    return this.supabaseService.count(this.tableName);
-  }
+
 }

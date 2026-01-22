@@ -44,10 +44,5 @@ export class DepartmentsService extends BaseService<
     return (departments || []).map((d) => this.mapData(d));
   }
 
-  /**
-   * Count total departments
-   */
-  async count(): Promise<number> {
-    return this.supabaseService.count(this.tableName);
-  }
+
 }

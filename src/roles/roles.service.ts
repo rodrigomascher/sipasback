@@ -41,10 +41,5 @@ export class RolesService extends BaseService<
     return (roles || []).map((r) => this.mapData(r));
   }
 
-  /**
-   * Count total roles
-   */
-  async count(): Promise<number> {
-    return this.supabaseService.count(this.tableName);
-  }
+
 }
