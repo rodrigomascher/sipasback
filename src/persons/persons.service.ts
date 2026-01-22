@@ -144,7 +144,7 @@ export class PersonsService {
 
   /**
    * Convert DTO to database format (camelCase to snake_case)
-   * Filters out null/undefined values and empty strings for numeric fields
+   * Filters out null/undefined values and empty strings for numeric and date fields
    */
   private dtoToData(
     dto: CreatePersonDto | UpdatePersonDto,
@@ -158,6 +158,11 @@ export class PersonsService {
       'incomeTypeId', 'monthlyIncome', 'annualIncome', 'educationLevelId', 'completionYear',
       'currentlyStudying', 'deceased', 'createdUnitId', 'updatedUnitId', 'referredUnitId',
     ]);
+    
+    const dateFields = new Set([
+      'birthDate', 'arrivalDateBrazil', 'rgIssuanceDate', 'certIssuanceDate',
+      'voterIdIssuanceDate', 'profCardIssuanceDate', 'militaryIssuanceDate', 'deathCertIssuanceDate',
+    ]);
 
     Object.keys(dto).forEach((key) => {
       const value = (dto as any)[key];
@@ -167,10 +172,10 @@ export class PersonsService {
         return;
       }
       
-      // Skip empty strings, especially for numeric fields
+      // Skip empty strings for numeric and date fields
       if (value === '') {
-        if (numericFields.has(key)) {
-          return; // Skip numeric fields with empty strings
+        if (numericFields.has(key) || dateFields.has(key)) {
+          return; // Skip numeric and date fields with empty strings
         }
         // Allow empty strings for text fields (will be stored as empty string or converted to null by DB)
       }
