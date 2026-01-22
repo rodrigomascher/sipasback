@@ -29,15 +29,31 @@ export class UserUnitsService {
     }
 
     // Fetch unit details for each unit_id
+    // Note: Supabase returns snake_case, so we access unit_id
     const unitIds = userUnits.map((uu) => uu.unit_id);
+    
+    if (unitIds.length === 0) {
+      return [];
+    }
+
+    // Fetch only the units that this user has
     const units = await this.supabaseService.select(
       'units',
       'id, name, type, city, state',
       {},
     );
 
-    // Filter units that the user has access to
-    return units.filter((unit: any) => unitIds.includes(unit.id));
+    // Filter and map units
+    const userUnits_ = units.filter((unit: any) => unitIds.includes(unit.id));
+    
+    // Return units with camelCase keys
+    return userUnits_.map((unit: any) => ({
+      id: unit.id,
+      name: unit.name,
+      type: unit.type,
+      city: unit.city,
+      state: unit.state,
+    }));
   }
 
   /**
