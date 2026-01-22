@@ -22,7 +22,7 @@ export class PersonsService {
    */
   async findAll(paginationQuery: PaginationQueryDto): Promise<PaginatedResponseDto<any>> {
     const query =
-      'id, created_at, updated_at, created_by, updated_by, first_name, last_name, birth_date, gender_id, gender_identity_id, sexual_orientation_id, cpf';
+      'id, created_at, updated_at, created_by, updated_by, first_name, last_name, birth_date, gender_id, gender_identity_id, cpf';
 
     const offset = paginationQuery.getOffset();
 

@@ -99,7 +99,6 @@ export interface Person extends BaseEntity {
   birth_date: string | null;
   gender_id: number | null;
   gender_identity_id: number | null;
-  sexual_orientation_id: number | null;
   cpf: string | null;
   created_by: number;
   updated_by: number | null;

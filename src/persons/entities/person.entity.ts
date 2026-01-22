@@ -9,6 +9,5 @@ export class Person {
   birthDate: Date;
   genderId?: number;
   genderIdentityId?: number;
-  sexualOrientationId?: number;
   cpf?: string;
 }
