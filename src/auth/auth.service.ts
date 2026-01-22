@@ -20,6 +20,13 @@ export interface UserSession {
   isArmoredUnit?: boolean;
   city: string;
   state: string;
+  units?: Array<{
+    id: number;
+    name: string;
+    type: string;
+    city: string;
+    state: string;
+  }>;
 }
 
 @Injectable()
@@ -70,6 +77,7 @@ export class AuthService {
         roleName: user.roleName,
         unitName: user.unitName,
         unitId: user.unitId,
+        units: user.units || [],
       },
     };
   }
@@ -117,6 +125,35 @@ export class AuthService {
           '[AUTH] Could not fetch user units:',
           (err as Error).message,
         );
+      }
+
+      // Get all units data for the user
+      const allUnits: Array<{
+        id: number;
+        name: string;
+        type: string;
+        city: string;
+        state: string;
+      }> = [];
+
+      if (userUnits && userUnits.length > 0) {
+        for (const userUnit of userUnits) {
+          if (userUnit.unit_id) {
+            const units = await this.supabaseService.select('units', '*', {
+              id: userUnit.unit_id,
+            });
+            if (units && units.length > 0) {
+              const unit = units[0] as any;
+              allUnits.push({
+                id: unit.id,
+                name: unit.name,
+                type: unit.type,
+                city: unit.city,
+                state: unit.state,
+              });
+            }
+          }
+        }
       }
 
       // Get first unit's data if available
@@ -214,6 +251,7 @@ export class AuthService {
         isArmoredUnit: unitData?.is_armored || false,
         city: unitData?.city || 'Unknown',
         state: unitData?.state || 'Unknown',
+        units: allUnits,
       };
     } catch (error) {
       console.error('[AUTH] Error validating user:', error);

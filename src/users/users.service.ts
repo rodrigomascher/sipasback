@@ -9,8 +9,8 @@ export interface UserDto {
   id: number;
   email: string;
   name: string;
-  is_active?: boolean;
-  last_login?: Date;
+  isActive?: boolean;
+  lastLogin?: Date;
   createdAt: Date;
   units?: any[];
 }
@@ -26,7 +26,7 @@ export class UpdateUserDto {
   email?: string;
   password?: string;
   name?: string;
-  is_active?: boolean;
+  isActive?: boolean;
   unitIds?: number[];
 }
 
@@ -52,8 +52,8 @@ export class UsersService extends BaseService<
       id: data.id,
       email: data.email,
       name: data.name,
-      is_active: data.is_active,
-      last_login: data.last_login ? new Date(data.last_login) : undefined,
+      isActive: data.is_active,
+      lastLogin: data.last_login ? new Date(data.last_login) : undefined,
       createdAt: new Date(data.created_at),
     };
   }
@@ -63,6 +63,11 @@ export class UsersService extends BaseService<
     if (transformed.password) {
       transformed.password_hash = await this.authService.hashPassword(transformed.password);
       delete transformed.password;
+    }
+    // Map isActive to is_active for database
+    if ('isActive' in transformed) {
+      transformed.is_active = transformed.isActive;
+      delete transformed.isActive;
     }
     // Remove unitIds from database transform (handled separately)
     delete transformed.unitIds;

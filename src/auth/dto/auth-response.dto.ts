@@ -20,12 +20,35 @@ export class AuthResponseDto {
   expires_in: number;
 
   @ApiProperty({
-    example: { id: 1, email: 'user@example.com', name: 'John Doe' },
-    description: 'Dados do usuário autenticado',
+    example: {
+      id: 1,
+      email: 'user@example.com',
+      name: 'John Doe',
+      units: [
+        {
+          id: 1,
+          name: 'Unit A',
+          type: 'Branch',
+          city: 'São Paulo',
+          state: 'SP',
+        },
+      ],
+    },
+    description: 'Dados do usuário autenticado com suas unidades',
   })
   user: {
     id: number;
     email: string;
     name: string;
+    roleName?: string;
+    unitName?: string;
+    unitId?: number | null;
+    units?: Array<{
+      id: number;
+      name: string;
+      type: string;
+      city: string;
+      state: string;
+    }>;
   };
 }
