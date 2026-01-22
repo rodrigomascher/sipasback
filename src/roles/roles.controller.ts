@@ -16,12 +16,14 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { RolesService } from './roles.service';
 import { CreateRoleDto, UpdateRoleDto, RoleDto } from './dto/role.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import type { UserSession } from '../auth/auth.service';
+import { PaginationQueryDto } from '../common/dto/paginated-response.dto';
 
 @ApiTags('roles')
 @Controller('roles')
@@ -31,18 +33,36 @@ export class RolesController {
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'List all roles' })
+  @ApiOperation({ summary: 'List roles with pagination' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'sortBy', required: false, type: String, example: 'name' })
+  @ApiQuery({ name: 'sortDirection', required: false, type: String, example: 'asc' })
+  @ApiQuery({ name: 'search', required: false, type: String, example: '' })
   @ApiResponse({
     status: 200,
-    description: 'List of roles',
+    description: 'Paginated list of roles',
     type: [RoleDto],
   })
   @ApiResponse({
     status: 401,
     description: 'Unauthorized',
   })
-  async findAll() {
-    return this.rolesService.findAll();
+  async findAll(
+    @Query('page') page?: number,
+    @Query('pageSize') pageSize?: number,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortDirection') sortDirection?: 'asc' | 'desc',
+    @Query('search') search?: string,
+  ) {
+    const paginationQuery = new PaginationQueryDto({
+      page: page || 1,
+      pageSize: pageSize || 10,
+      sortBy: sortBy || 'id',
+      sortDirection: sortDirection || 'asc',
+      search,
+    });
+    return this.rolesService.findAll(paginationQuery);
   }
 
   @Get('search/technician')

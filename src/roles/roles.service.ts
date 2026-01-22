@@ -1,21 +1,42 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import { CreateRoleDto, UpdateRoleDto, RoleDto } from './dto/role.dto';
+import { PaginatedResponseDto, PaginationQueryDto } from '../common/dto/paginated-response.dto';
 
 @Injectable()
 export class RolesService {
   constructor(private supabaseService: SupabaseService) {}
 
+  private toCamelCase(obj: any): any {
+    if (!obj) return obj;
+    const result: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+      result[camelKey] = value;
+    }
+    return result;
+  }
+
   /**
-   * Get all roles
+   * Get all roles with pagination
    */
-  async findAll(): Promise<RoleDto[]> {
-    const roles = await this.supabaseService.select(
-      'roles',
-      'id, name, description, is_technician, created_by, updated_by, created_at, updated_at',
+  async findAll(paginationQuery: PaginationQueryDto): Promise<PaginatedResponseDto<any>> {
+    const columns = 'id, name, description, active, created_by, updated_by, created_at, updated_at';
+    const offset = paginationQuery.getOffset();
+    
+    // Get paginated data with count
+    const { data, count } = await this.supabaseService.selectWithCount(
+      'role',
+      columns,
+      {},
+      paginationQuery.sortBy,
+      paginationQuery.sortDirection,
+      paginationQuery.pageSize,
+      offset
     );
 
-    return (roles || []).map(this.mapToRoleDto);
+    const mappedData = data?.map(item => this.toCamelCase(item)) || [];
+    return new PaginatedResponseDto(mappedData, count || 0, paginationQuery.page, paginationQuery.pageSize);
   }
 
   /**

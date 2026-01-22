@@ -1,21 +1,42 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import { CreateEmployeeDto, UpdateEmployeeDto, EmployeeDto } from './dto/employee.dto';
+import { PaginatedResponseDto, PaginationQueryDto } from '../common/dto/paginated-response.dto';
 
 @Injectable()
 export class EmployeesService {
   constructor(private supabaseService: SupabaseService) {}
 
+  private toCamelCase(obj: any): any {
+    if (!obj) return obj;
+    const result: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+      result[camelKey] = value;
+    }
+    return result;
+  }
+
   /**
-   * Get all employees
+   * Get all employees with pagination
    */
-  async findAll(): Promise<EmployeeDto[]> {
-    const employees = await this.supabaseService.select(
-      'employees',
-      'id, employee_id, full_name, unit_id, department_id, role_id, is_technician, created_by, updated_by, created_at, updated_at',
+  async findAll(paginationQuery: PaginationQueryDto): Promise<PaginatedResponseDto<any>> {
+    const columns = 'id, name, email, active, created_by, updated_by, created_at, updated_at';
+    const offset = paginationQuery.getOffset();
+    
+    // Get paginated data with count
+    const { data, count } = await this.supabaseService.selectWithCount(
+      'employee',
+      columns,
+      {},
+      paginationQuery.sortBy,
+      paginationQuery.sortDirection,
+      paginationQuery.pageSize,
+      offset
     );
 
-    return (employees || []).map(this.mapToEmployeeDto);
+    const mappedData = data?.map(item => this.toCamelCase(item)) || [];
+    return new PaginatedResponseDto(mappedData, count || 0, paginationQuery.page, paginationQuery.pageSize);
   }
 
   /**

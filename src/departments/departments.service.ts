@@ -1,21 +1,42 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import { CreateDepartmentDto, UpdateDepartmentDto, DepartmentDto } from './dto/department.dto';
+import { PaginatedResponseDto, PaginationQueryDto } from '../common/dto/paginated-response.dto';
 
 @Injectable()
 export class DepartmentsService {
   constructor(private supabaseService: SupabaseService) {}
 
+  private toCamelCase(obj: any): any {
+    if (!obj) return obj;
+    const result: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+      result[camelKey] = value;
+    }
+    return result;
+  }
+
   /**
-   * Get all departments
+   * Get all departments with pagination
    */
-  async findAll(): Promise<DepartmentDto[]> {
-    const departments = await this.supabaseService.select(
-      'departments',
-      'id, name, unit_id, created_by, updated_by, created_at, updated_at',
+  async findAll(paginationQuery: PaginationQueryDto): Promise<PaginatedResponseDto<any>> {
+    const columns = 'id, name, active, created_by, updated_by, created_at, updated_at';
+    const offset = paginationQuery.getOffset();
+    
+    // Get paginated data with count
+    const { data, count } = await this.supabaseService.selectWithCount(
+      'department',
+      columns,
+      {},
+      paginationQuery.sortBy,
+      paginationQuery.sortDirection,
+      paginationQuery.pageSize,
+      offset
     );
 
-    return (departments || []).map(this.mapToDepartmentDto);
+    const mappedData = data?.map(item => this.toCamelCase(item)) || [];
+    return new PaginatedResponseDto(mappedData, count || 0, paginationQuery.page, paginationQuery.pageSize);
   }
 
   /**
