@@ -18,11 +18,6 @@ export class CreateDepartmentDto {
   @MinLength(3)
   @MaxLength(255)
   description: string;
-
-  @ApiProperty({ description: 'Unit ID', example: 1 })
-  @IsNumber()
-  @IsNotEmpty()
-  unitId: number;
 }
 
 /**
@@ -38,11 +33,6 @@ export class UpdateDepartmentDto {
   @MinLength(3)
   @MaxLength(255)
   description?: string;
-
-  @ApiPropertyOptional({ description: 'Unit ID', example: 1 })
-  @IsNumber()
-  @IsOptional()
-  unitId?: number;
 }
 
 /**
@@ -54,9 +44,6 @@ export class DepartmentDto {
 
   @ApiProperty({ description: 'Department description', example: 'Engineering' })
   description: string;
-
-  @ApiProperty({ description: 'Unit ID', example: 1 })
-  unitId: number;
 
   @ApiPropertyOptional({
     description: 'User ID who created this record',
