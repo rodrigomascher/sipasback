@@ -83,12 +83,11 @@ export class UsersService extends BaseService<
    * Create user with units - wrapper around base create
    */
   async createWithUnits(dto: CreateUserDto, userId?: number): Promise<UserDto> {
-    // Create user first (without unitIds)
-    const userDto = { ...dto } as CreateUserDto;
-    const unitIds = userDto.unitIds;
-    delete userDto.unitIds;
+    // Extract unitIds (transformForDb will remove it before saving to DB)
+    const unitIds = dto.unitIds;
 
-    const user = await super.create(userDto, userId);
+    // Create user (transformForDb will remove unitIds before saving to DB)
+    const user = await super.create(dto, userId);
 
     // Then add units
     if (unitIds && unitIds.length > 0) {
@@ -103,12 +102,11 @@ export class UsersService extends BaseService<
    * Update user with units - wrapper around base update
    */
   async updateWithUnits(id: number, dto: UpdateUserDto, userId?: number): Promise<UserDto> {
-    // Update user first (without unitIds)
-    const userDto = { ...dto } as UpdateUserDto;
-    const unitIds = userDto.unitIds;
-    delete userDto.unitIds;
+    // Extract unitIds before update (transformForDb will remove it too)
+    const unitIds = dto.unitIds;
 
-    const user = await super.update(id, userDto, userId);
+    // Update user (transformForDb will remove unitIds before saving to DB)
+    const user = await super.update(id, dto, userId);
 
     // Then update units if provided
     if (unitIds !== undefined) {
