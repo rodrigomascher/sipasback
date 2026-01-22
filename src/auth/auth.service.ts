@@ -100,8 +100,9 @@ export class AuthService {
         return null;
       }
 
-      // Verify password (in production, use proper bcrypt comparison)
-      if (user.password_hash !== password) {
+      // Verify password using bcrypt
+      const isPasswordValid = await this.comparePassword(password, user.password_hash);
+      if (!isPasswordValid) {
         return null;
       }
 

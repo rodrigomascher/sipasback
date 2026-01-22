@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import { BaseService } from '../common/base/base.service';
 import { User } from '../common/types/database.types';
+import { AuthService } from '../auth/auth.service';
 
 export interface UserDto {
   id: number;
@@ -12,11 +13,13 @@ export interface UserDto {
 
 export class CreateUserDto {
   email: string;
+  password: string;
   name: string;
 }
 
 export class UpdateUserDto {
   email?: string;
+  password?: string;
   name?: string;
 }
 
@@ -29,7 +32,10 @@ export class UsersService extends BaseService<
   protected tableName = 'users';
   protected columns = 'id, email, name, created_at';
 
-  constructor(supabaseService: SupabaseService) {
+  constructor(
+    supabaseService: SupabaseService,
+    private authService: AuthService,
+  ) {
     super(supabaseService);
   }
 
@@ -43,7 +49,12 @@ export class UsersService extends BaseService<
   }
 
   protected transformForDb(dto: CreateUserDto | UpdateUserDto): any {
-    return dto;
+    const transformed: any = { ...dto };
+    if (transformed.password) {
+      transformed.password_hash = await this.authService.hashPassword(transformed.password);
+      delete transformed.password;
+    }
+    return transformed;
   }
 
   /**
