@@ -20,7 +20,7 @@ export class UserUnitsService {
   async getUnitsForUser(userId: number): Promise<any[]> {
     const userUnits = await this.supabaseService.select<any>(
       this.tableName,
-      'id, unit_id, created_at',
+      'unit_id, created_at',
       { user_id: userId },
     );
 
