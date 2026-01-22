@@ -23,9 +23,7 @@ export class UnitsService extends BaseService<
     return toCamelCase(data);
   }
 
-  protected transformForDb(
-    dto: CreateUnitDto | UpdateUnitDto,
-  ): any {
+  protected transformForDb(dto: CreateUnitDto | UpdateUnitDto): any {
     const transformed = toSnakeCase(dto);
     // Handle specific field transformations
     if ('state' in dto && dto.state) {
@@ -57,6 +55,4 @@ export class UnitsService extends BaseService<
     );
     return (units || []).map((u) => this.mapData(u));
   }
-
-
 }

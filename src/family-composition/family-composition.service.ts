@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import {
   CreateFamilyCompositionDto,
@@ -62,9 +59,7 @@ export class FamilyCompositionService extends BaseService<
   /**
    * Override create to add validation
    */
-  async create(
-    dto: CreateFamilyCompositionDto,
-  ): Promise<any> {
+  async create(dto: CreateFamilyCompositionDto): Promise<any> {
     await this.validatePersonNotInOtherFamily(
       dto.idPerson,
       dto.idFamilyComposition,

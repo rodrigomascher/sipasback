@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
-import {
-  CreateEmployeeDto,
-  UpdateEmployeeDto,
-} from './dto/employee.dto';
+import { CreateEmployeeDto, UpdateEmployeeDto } from './dto/employee.dto';
 import { toCamelCase, toSnakeCase } from '../common/utils/transform.utils';
 import { Employee } from '../common/types/database.types';
 import { BaseService } from '../common/base/base.service';
@@ -26,9 +23,7 @@ export class EmployeesService extends BaseService<
     return toCamelCase(data);
   }
 
-  protected transformForDb(
-    dto: CreateEmployeeDto | UpdateEmployeeDto,
-  ): any {
+  protected transformForDb(dto: CreateEmployeeDto | UpdateEmployeeDto): any {
     return toSnakeCase(dto);
   }
 
@@ -67,6 +62,4 @@ export class EmployeesService extends BaseService<
     );
     return (employees || []).map((e) => this.mapData(e));
   }
-
-
 }

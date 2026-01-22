@@ -1,13 +1,5 @@
-import {
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  Body,
-  Query,
-} from '@nestjs/common';
-import { PaginatedResponseDto, PaginationQueryDto } from '../dto/paginated-response.dto';
+import { Get, Post, Put, Delete, Param, Body, Query } from '@nestjs/common';
+import { PaginatedResponseDto } from '../dto/paginated-response.dto';
 import { PaginationQueryBuilder } from '../utils/pagination.builder';
 import {
   ApiListOperation,
@@ -16,7 +8,6 @@ import {
   ApiUpdateOperation,
   ApiDeleteOperation,
 } from '../decorators/api-crud.decorator';
-import { BaseService } from './base.service';
 
 /**
  * BaseController - Abstract base class for CRUD controllers
@@ -73,10 +64,7 @@ export abstract class BaseController<T, CreateDto, UpdateDto> {
 
   @Put(':id')
   @ApiUpdateOperation()
-  async update(
-    @Param('id') id: string,
-    @Body() dto: UpdateDto,
-  ): Promise<T> {
+  async update(@Param('id') id: string, @Body() dto: UpdateDto): Promise<T> {
     return this.service.update(this.parseId(id), dto);
   }
 

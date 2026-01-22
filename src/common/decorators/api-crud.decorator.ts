@@ -1,4 +1,9 @@
-import { applyDecorators, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
+import {
+  applyDecorators,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -105,7 +110,9 @@ export function ApiCrudOperation(
  * @ApiListOperation('List items')
  * async findAll(@Query() query: any) { ... }
  */
-export function ApiListOperation(summary: string = 'List items with pagination') {
+export function ApiListOperation(
+  summary: string = 'List items with pagination',
+) {
   return applyDecorators(
     ApiCrudOperation(summary, 200, true),
     ApiPaginationQuery(),

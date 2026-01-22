@@ -24,9 +24,7 @@ export class GendersService extends BaseService<
     return toCamelCase(data);
   }
 
-  protected transformForDb(
-    dto: CreateGenderDto | UpdateGenderDto,
-  ): any {
+  protected transformForDb(dto: CreateGenderDto | UpdateGenderDto): any {
     return toSnakeCase(dto);
   }
 }

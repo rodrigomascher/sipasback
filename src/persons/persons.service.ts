@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
@@ -27,26 +24,27 @@ export class PersonsService extends BaseService<
     return toCamelCase(data);
   }
 
-  protected transformForDb(
-    dto: CreatePersonDto | UpdatePersonDto,
-  ): any {
+  protected transformForDb(dto: CreatePersonDto | UpdatePersonDto): any {
     const transformed = toSnakeCase(dto);
-    
+
     // Convert empty CPF to null
     if (transformed.cpf === '') {
       transformed.cpf = null;
     }
-    
+
     // Filter out empty numeric fields (like monthlyIncome)
     const filtered: any = {};
     for (const [key, value] of Object.entries(transformed)) {
       // Skip empty string values for numeric fields
-      if (value === '' && (key === 'monthly_income' || key === 'annual_income')) {
+      if (
+        value === '' &&
+        (key === 'monthly_income' || key === 'annual_income')
+      ) {
         continue;
       }
       filtered[key] = value;
     }
-    
+
     return filtered;
   }
 
@@ -71,10 +69,7 @@ export class PersonsService extends BaseService<
   /**
    * Override update to add CPF uniqueness validation
    */
-  async update(
-    id: number,
-    updatePersonDto: UpdatePersonDto,
-  ): Promise<any> {
+  async update(id: number, updatePersonDto: UpdatePersonDto): Promise<any> {
     // Check if person exists
     await this.findOne(id);
 

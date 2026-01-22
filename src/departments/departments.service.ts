@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
-import {
-  CreateDepartmentDto,
-  UpdateDepartmentDto,
-} from './dto/department.dto';
+import { CreateDepartmentDto, UpdateDepartmentDto } from './dto/department.dto';
 import { toCamelCase, toSnakeCase } from '../common/utils/transform.utils';
 import { Department } from '../common/types/database.types';
 import { BaseService } from '../common/base/base.service';
@@ -43,6 +40,4 @@ export class DepartmentsService extends BaseService<
     );
     return (departments || []).map((d) => this.mapData(d));
   }
-
-
 }

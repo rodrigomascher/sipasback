@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { toSnakeCase } from '../common/utils/transform.utils';
 
 @Injectable()
 export class SupabaseService {
@@ -52,7 +51,9 @@ export class SupabaseService {
         /[A-Z]/g,
         (letter) => `_${letter.toLowerCase()}`,
       );
-      query = query.order(snakeCaseSortBy, { ascending: sortDirection === 'asc' });
+      query = query.order(snakeCaseSortBy, {
+        ascending: sortDirection === 'asc',
+      });
     }
 
     if (limit) {
@@ -100,7 +101,9 @@ export class SupabaseService {
         /[A-Z]/g,
         (letter) => `_${letter.toLowerCase()}`,
       );
-      query = query.order(snakeCaseSortBy, { ascending: sortDirection === 'asc' });
+      query = query.order(snakeCaseSortBy, {
+        ascending: sortDirection === 'asc',
+      });
     }
 
     if (limit) {

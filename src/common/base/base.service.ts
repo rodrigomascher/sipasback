@@ -74,9 +74,7 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
     );
 
     if (!result || result.length === 0) {
-      throw new NotFoundException(
-        `${this.tableName} with ID ${id} not found`,
-      );
+      throw new NotFoundException(`${this.tableName} with ID ${id} not found`);
     }
 
     return this.mapData(result[0]);
@@ -88,10 +86,7 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
   async create(dto: CreateDto): Promise<T> {
     const data = this.transformForDb(dto);
 
-    const result = await this.supabaseService.insert<T>(
-      this.tableName,
-      data,
-    );
+    const result = await this.supabaseService.insert<T>(this.tableName, data);
 
     if (!result || result.length === 0) {
       throw new Error(`Failed to create ${this.tableName}`);
@@ -109,11 +104,9 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
 
     const data = this.transformForDb(dto);
 
-    const result = await this.supabaseService.update<T>(
-      this.tableName,
-      data,
-      { id },
-    );
+    const result = await this.supabaseService.update<T>(this.tableName, data, {
+      id,
+    });
 
     if (!result || result.length === 0) {
       throw new Error(`Failed to update ${this.tableName}`);

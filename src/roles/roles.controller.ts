@@ -16,7 +16,6 @@ export class RolesController extends BaseController<
     super(rolesService);
   }
 
-
   @Get('search/technician')
   @ApiCrudOperation('Find roles by technician flag')
   async findByTechnician(@Query('isTechnician') isTechnician: string) {

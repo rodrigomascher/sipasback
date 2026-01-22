@@ -2,10 +2,7 @@ import { Controller, Get, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiCrudOperation } from '../common/decorators/api-crud.decorator';
 import { EmployeesService } from './employees.service';
-import {
-  CreateEmployeeDto,
-  UpdateEmployeeDto,
-} from './dto/employee.dto';
+import { CreateEmployeeDto, UpdateEmployeeDto } from './dto/employee.dto';
 import { BaseController } from '../common/base/base.controller';
 
 @ApiTags('employees')

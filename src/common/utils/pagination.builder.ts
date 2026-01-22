@@ -1,5 +1,3 @@
-import { PaginationQueryDto } from '../dto/paginated-response.dto';
-
 /**
  * PaginationQueryBuilder - Utility for constructing pagination queries from raw parameters
  * Converts string/number query parameters to typed PaginationQueryDto
@@ -22,16 +20,16 @@ export class PaginationQueryBuilder {
     page?: string | number;
     pageSize?: string | number;
     sortBy?: string;
-    sortDirection?: 'asc' | 'desc' | string;
+    sortDirection?: string;
     search?: string;
-  }): PaginationQueryDto {
-    return new PaginationQueryDto({
+  }) {
+    return {
       page: this.parseNumber(query.page, 1),
       pageSize: this.parseNumber(query.pageSize, 10),
       sortBy: query.sortBy || 'id',
       sortDirection: (query.sortDirection as 'asc' | 'desc') || 'asc',
       search: query.search,
-    });
+    };
   }
 
   /**

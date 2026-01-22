@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import { BaseService } from '../common/base/base.service';
-import { toCamelCase } from '../common/utils/transform.utils';
 import { User } from '../common/types/database.types';
 
 export interface UserDto {
@@ -22,7 +21,11 @@ export class UpdateUserDto {
 }
 
 @Injectable()
-export class UsersService extends BaseService<User, CreateUserDto, UpdateUserDto> {
+export class UsersService extends BaseService<
+  User,
+  CreateUserDto,
+  UpdateUserDto
+> {
   protected tableName = 'users';
   protected columns = 'id, email, name, created_at';
 

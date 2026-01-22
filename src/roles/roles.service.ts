@@ -23,9 +23,7 @@ export class RolesService extends BaseService<
     return toCamelCase(data);
   }
 
-  protected transformForDb(
-    dto: CreateRoleDto | UpdateRoleDto,
-  ): any {
+  protected transformForDb(dto: CreateRoleDto | UpdateRoleDto): any {
     return toSnakeCase(dto);
   }
 
@@ -40,6 +38,4 @@ export class RolesService extends BaseService<
     );
     return (roles || []).map((r) => this.mapData(r));
   }
-
-
 }
