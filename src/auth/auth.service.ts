@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { SupabaseService } from '../database/supabase.service';
+import { User } from '../common/types/database.types';
 import * as bcrypt from 'bcrypt';
 
 export interface UserSession {
@@ -77,10 +78,13 @@ export class AuthService {
    * Validate user credentials
    * Checks Supabase database for user with related data
    */
-  async validateUser(email: string, password: string): Promise<UserSession | null> {
+  async validateUser(
+    email: string,
+    password: string,
+  ): Promise<UserSession | null> {
     try {
       // Query user from Supabase (without unit_id, department_id, role_id - now in junction tables)
-      const users = await this.supabaseService.select(
+      const users = await this.supabaseService.select<User>(
         'users',
         'id, email, name, password_hash, employee_id, last_login, is_active',
         { email },
@@ -104,21 +108,31 @@ export class AuthService {
       // Fetch user's units from junction table
       let userUnits: any[] = [];
       try {
-        userUnits = await this.supabaseService.select(
-          'user_units',
-          'unit_id',
-          { user_id: user.id }
-        );
+        userUnits = await this.supabaseService.select('user_units', 'unit_id', {
+          user_id: user.id,
+        });
       } catch (err) {
-        console.warn('[AUTH] Could not fetch user units:', err.message);
+        console.warn(
+          '[AUTH] Could not fetch user units:',
+          (err as Error).message,
+        );
       }
 
       // Get first unit's data if available
-      let unitData: any = { id: null, name: 'Unknown Unit', type: 'Unknown', is_armored: false, city: 'Unknown', state: 'Unknown' };
+      let unitData: any = {
+        id: null,
+        name: 'Unknown Unit',
+        type: 'Unknown',
+        is_armored: false,
+        city: 'Unknown',
+        state: 'Unknown',
+      };
       if (userUnits && userUnits.length > 0) {
-        const firstUnit = userUnits[0] as any;
+        const firstUnit = userUnits[0];
         if (firstUnit.unit_id) {
-          const units = await this.supabaseService.select('units', '*', { id: firstUnit.unit_id });
+          const units = await this.supabaseService.select('units', '*', {
+            id: firstUnit.unit_id,
+          });
           if (units && units.length > 0) {
             unitData = units[0];
           }
@@ -131,17 +145,22 @@ export class AuthService {
         userDepartments = await this.supabaseService.select(
           'user_departments',
           'department_id',
-          { user_id: user.id }
+          { user_id: user.id },
         );
       } catch (err) {
-        console.warn('[AUTH] Could not fetch user departments:', err.message);
+        console.warn(
+          '[AUTH] Could not fetch user departments:',
+          (err as Error).message,
+        );
       }
 
       let departmentData: any = { id: null, name: 'Unknown Department' };
       if (userDepartments && userDepartments.length > 0) {
-        const firstDept = userDepartments[0] as any;
+        const firstDept = userDepartments[0];
         if (firstDept.department_id) {
-          const depts = await this.supabaseService.select('departments', '*', { id: firstDept.department_id });
+          const depts = await this.supabaseService.select('departments', '*', {
+            id: firstDept.department_id,
+          });
           if (depts && depts.length > 0) departmentData = depts[0];
         }
       }
@@ -149,28 +168,31 @@ export class AuthService {
       // Fetch user's roles from junction table
       let userRoles: any[] = [];
       try {
-        userRoles = await this.supabaseService.select(
-          'user_roles',
-          'role_id',
-          { user_id: user.id }
-        );
+        userRoles = await this.supabaseService.select('user_roles', 'role_id', {
+          user_id: user.id,
+        });
       } catch (err) {
-        console.warn('[AUTH] Could not fetch user roles:', err.message);
+        console.warn(
+          '[AUTH] Could not fetch user roles:',
+          (err as Error).message,
+        );
       }
 
       let roleData: any = { id: null, name: 'User', is_technician: false };
       if (userRoles && userRoles.length > 0) {
-        const firstRole = userRoles[0] as any;
+        const firstRole = userRoles[0];
         if (firstRole.role_id) {
-          const roles = await this.supabaseService.select('roles', '*', { id: firstRole.role_id });
+          const roles = await this.supabaseService.select('roles', '*', {
+            id: firstRole.role_id,
+          });
           if (roles && roles.length > 0) roleData = roles[0];
         }
       }
 
       // Update last login
-      await this.supabaseService.update(
+      await this.supabaseService.update<User>(
         'users',
-        { last_login: new Date().toISOString() },
+        { last_login: new Date().toISOString() } as unknown as Partial<User>,
         { id: user.id },
       );
 
@@ -179,7 +201,7 @@ export class AuthService {
         id: user.id,
         email: user.email,
         name: user.name,
-        employeeId: user.employee_id || null,
+        employeeId: (user as any).employee_id || null,
         unitId: unitData?.id || null,
         unitName: unitData?.name || 'Unknown Unit',
         unitType: unitData?.type || 'Unknown',

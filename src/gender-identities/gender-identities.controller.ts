@@ -1,5 +1,21 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Put,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { GenderIdentitiesService } from './gender-identities.service';
 import { CreateGenderIdentityDto } from './dto/create-gender-identity.dto';
 import { UpdateGenderIdentityDto } from './dto/update-gender-identity.dto';
@@ -9,7 +25,9 @@ import { PaginationQueryDto } from '../common/dto/paginated-response.dto';
 @ApiTags('gender-identities')
 @Controller('api/gender-identities')
 export class GenderIdentitiesController {
-  constructor(private readonly genderIdentitiesService: GenderIdentitiesService) {}
+  constructor(
+    private readonly genderIdentitiesService: GenderIdentitiesService,
+  ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -24,8 +42,18 @@ export class GenderIdentitiesController {
   @ApiOperation({ summary: 'List gender identities with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
-  @ApiQuery({ name: 'sortBy', required: false, type: String, example: 'description' })
-  @ApiQuery({ name: 'sortDirection', required: false, type: String, example: 'asc' })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    type: String,
+    example: 'description',
+  })
+  @ApiQuery({
+    name: 'sortDirection',
+    required: false,
+    type: String,
+    example: 'asc',
+  })
   @ApiQuery({ name: 'search', required: false, type: String, example: '' })
   @ApiResponse({ status: 200, description: 'Paginated gender identities list' })
   findAll(
@@ -51,7 +79,10 @@ export class GenderIdentitiesController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateGenderIdentityDto: UpdateGenderIdentityDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateGenderIdentityDto: UpdateGenderIdentityDto,
+  ) {
     return this.genderIdentitiesService.update(+id, updateGenderIdentityDto);
   }
 

@@ -8,7 +8,12 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UserDto } from './dto/user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -55,10 +60,7 @@ export class UsersController {
     description: 'User created successfully',
     type: UserDto,
   })
-  create(
-    @Body('email') email: string,
-    @Body('name') name: string,
-  ) {
+  create(@Body('email') email: string, @Body('name') name: string) {
     return this.usersService.create(email, name);
   }
 

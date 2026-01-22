@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { PersonsService } from './persons.service';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
@@ -49,7 +58,10 @@ export class PersonsController {
    * PUT /api/persons/:id
    */
   @Put(':id')
-  async update(@Param('id') id: string, @Body() updatePersonDto: UpdatePersonDto): Promise<Person> {
+  async update(
+    @Param('id') id: string,
+    @Body() updatePersonDto: UpdatePersonDto,
+  ): Promise<Person> {
     return this.personsService.update(parseInt(id, 10), updatePersonDto);
   }
 

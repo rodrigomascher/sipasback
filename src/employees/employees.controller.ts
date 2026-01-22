@@ -19,7 +19,11 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { EmployeesService } from './employees.service';
-import { CreateEmployeeDto, UpdateEmployeeDto, EmployeeDto } from './dto/employee.dto';
+import {
+  CreateEmployeeDto,
+  UpdateEmployeeDto,
+  EmployeeDto,
+} from './dto/employee.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import type { UserSession } from '../auth/auth.service';
@@ -37,7 +41,12 @@ export class EmployeesController {
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
   @ApiQuery({ name: 'sortBy', required: false, type: String, example: 'name' })
-  @ApiQuery({ name: 'sortDirection', required: false, type: String, example: 'asc' })
+  @ApiQuery({
+    name: 'sortDirection',
+    required: false,
+    type: String,
+    example: 'asc',
+  })
   @ApiQuery({ name: 'search', required: false, type: String, example: '' })
   @ApiResponse({
     status: 200,

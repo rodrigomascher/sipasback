@@ -37,7 +37,12 @@ export class RolesController {
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
   @ApiQuery({ name: 'sortBy', required: false, type: String, example: 'name' })
-  @ApiQuery({ name: 'sortDirection', required: false, type: String, example: 'asc' })
+  @ApiQuery({
+    name: 'sortDirection',
+    required: false,
+    type: String,
+    example: 'asc',
+  })
   @ApiQuery({ name: 'search', required: false, type: String, example: '' })
   @ApiResponse({
     status: 200,

@@ -112,15 +112,29 @@ export class EmployeeDto {
   @ApiProperty({ description: 'Is technician', example: true })
   isTechnician: boolean;
 
-  @ApiPropertyOptional({ description: 'User ID who created this record', example: 1, nullable: true })
+  @ApiPropertyOptional({
+    description: 'User ID who created this record',
+    example: 1,
+    nullable: true,
+  })
   createdBy: number | null;
 
-  @ApiPropertyOptional({ description: 'User ID who last modified this record', example: 1, nullable: true })
+  @ApiPropertyOptional({
+    description: 'User ID who last modified this record',
+    example: 1,
+    nullable: true,
+  })
   updatedBy: number | null;
 
-  @ApiProperty({ description: 'Created timestamp', example: '2026-01-21T10:00:00Z' })
+  @ApiProperty({
+    description: 'Created timestamp',
+    example: '2026-01-21T10:00:00Z',
+  })
   createdAt: string;
 
-  @ApiProperty({ description: 'Updated timestamp', example: '2026-01-21T10:00:00Z' })
+  @ApiProperty({
+    description: 'Updated timestamp',
+    example: '2026-01-21T10:00:00Z',
+  })
   updatedAt: string;
 }

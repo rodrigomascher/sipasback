@@ -1,4 +1,11 @@
-import { Body, Controller, Post, HttpCode, HttpStatus, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  HttpCode,
+  HttpStatus,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -33,12 +40,17 @@ export class AuthController {
       );
 
       if (!user) {
-        this.logger.logAuth(loginDto.email, false, { reason: 'Invalid credentials' });
+        this.logger.logAuth(loginDto.email, false, {
+          reason: 'Invalid credentials',
+        });
         throw new UnauthorizedException('Invalid credentials');
       }
 
       const result = this.authService.login(user);
-      this.logger.logAuth(loginDto.email, true, { userId: user.id, unitId: user.unitId });
+      this.logger.logAuth(loginDto.email, true, {
+        userId: user.id,
+        unitId: user.unitId,
+      });
       return result;
     } catch (error) {
       this.logger.logError(

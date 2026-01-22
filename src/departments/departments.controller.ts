@@ -19,7 +19,11 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { DepartmentsService } from './departments.service';
-import { CreateDepartmentDto, UpdateDepartmentDto, DepartmentDto } from './dto/department.dto';
+import {
+  CreateDepartmentDto,
+  UpdateDepartmentDto,
+  DepartmentDto,
+} from './dto/department.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import type { UserSession } from '../auth/auth.service';
@@ -37,7 +41,12 @@ export class DepartmentsController {
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
   @ApiQuery({ name: 'sortBy', required: false, type: String, example: 'name' })
-  @ApiQuery({ name: 'sortDirection', required: false, type: String, example: 'asc' })
+  @ApiQuery({
+    name: 'sortDirection',
+    required: false,
+    type: String,
+    example: 'asc',
+  })
   @ApiQuery({ name: 'search', required: false, type: String, example: '' })
   @ApiResponse({
     status: 200,
@@ -164,7 +173,11 @@ export class DepartmentsController {
     @Param('id') id: string,
     @Body() updateDepartmentDto: UpdateDepartmentDto,
   ) {
-    return this.departmentsService.update(Number(id), updateDepartmentDto, user.id);
+    return this.departmentsService.update(
+      Number(id),
+      updateDepartmentDto,
+      user.id,
+    );
   }
 
   @Delete(':id')

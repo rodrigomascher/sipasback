@@ -12,14 +12,14 @@ async function bootstrap() {
   // Configuração de CORS
   app.enableCors({
     origin: [
-      'http://localhost:4200',      // Development
-      'http://localhost:3000',      // Alternative dev
+      'http://localhost:4200', // Development
+      'http://localhost:3000', // Alternative dev
       'http://127.0.0.1:4200',
-      process.env.FRONTEND_URL      // From environment
+      process.env.FRONTEND_URL, // From environment
     ].filter(Boolean),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   // Configuração do Swagger
@@ -42,8 +42,12 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000, () => {
     console.log(`🚀 Server is running on port ${process.env.PORT ?? 3000}`);
-    console.log(`📚 Swagger is running on http://localhost:${process.env.PORT ?? 3000}/docs`);
-    console.log(`✅ Supabase connected: ${process.env.SUPABASE_URL ? 'YES' : 'NO'}`);
+    console.log(
+      `📚 Swagger is running on http://localhost:${process.env.PORT ?? 3000}/docs`,
+    );
+    console.log(
+      `✅ Supabase connected: ${process.env.SUPABASE_URL ? 'YES' : 'NO'}`,
+    );
   });
 }
 bootstrap();

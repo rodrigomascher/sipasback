@@ -9,9 +9,19 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { FamilyCompositionService } from './family-composition.service';
-import { CreateFamilyCompositionDto, UpdateFamilyCompositionDto, FamilyCompositionDto } from './dto/family-composition.dto';
+import {
+  CreateFamilyCompositionDto,
+  UpdateFamilyCompositionDto,
+  FamilyCompositionDto,
+} from './dto/family-composition.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PaginationQueryDto } from '../common/dto/paginated-response.dto';
 
@@ -39,8 +49,18 @@ export class FamilyCompositionController {
   @ApiOperation({ summary: 'List family compositions with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'pageSize', required: false, type: Number, example: 10 })
-  @ApiQuery({ name: 'sortBy', required: false, type: String, example: 'id_family_composition' })
-  @ApiQuery({ name: 'sortDirection', required: false, type: String, example: 'asc' })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    type: String,
+    example: 'id_family_composition',
+  })
+  @ApiQuery({
+    name: 'sortDirection',
+    required: false,
+    type: String,
+    example: 'asc',
+  })
   @ApiResponse({
     status: 200,
     description: 'Paginated family compositions list',

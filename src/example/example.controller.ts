@@ -1,6 +1,6 @@
 /**
  * Example of how to access JWT session data in any controller
- * 
+ *
  * This file demonstrates how to use the @GetUser() decorator
  * to access the JWT payload in protected controllers
  */
@@ -15,7 +15,7 @@ import { GetUser } from '../common/decorators/get-user.decorator';
 export class ExampleController {
   /**
    * Example endpoint: access JWT session data
-   * 
+   *
    * The @GetUser() decorator extracts the JWT payload
    * and returns it as an object with all session data
    */
@@ -76,7 +76,8 @@ export class ExampleController {
   @ApiBearerAuth('access-token')
   @ApiOperation({
     summary: 'Example: User context',
-    description: 'Returns an object with structured context to use in business logic',
+    description:
+      'Returns an object with structured context to use in business logic',
   })
   getUserContext(@GetUser() user: any) {
     // Structure the data as needed for your business logic

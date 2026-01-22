@@ -1,8 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
-import { CreateEmployeeDto, UpdateEmployeeDto, EmployeeDto } from './dto/employee.dto';
-import { PaginatedResponseDto, PaginationQueryDto } from '../common/dto/paginated-response.dto';
+import {
+  CreateEmployeeDto,
+  UpdateEmployeeDto,
+  EmployeeDto,
+} from './dto/employee.dto';
+import {
+  PaginatedResponseDto,
+  PaginationQueryDto,
+} from '../common/dto/paginated-response.dto';
 import { toCamelCase } from '../common/utils/transform.utils';
+import { Employee } from '../common/types/database.types';
 
 @Injectable()
 export class EmployeesService {
@@ -11,30 +19,39 @@ export class EmployeesService {
   /**
    * Get all employees with pagination
    */
-  async findAll(paginationQuery: PaginationQueryDto): Promise<PaginatedResponseDto<any>> {
-    const columns = 'id, name, email, active, created_by, updated_by, created_at, updated_at';
+  async findAll(
+    paginationQuery: PaginationQueryDto,
+  ): Promise<PaginatedResponseDto<any>> {
+    const columns =
+      'id, name, email, active, created_by, updated_by, created_at, updated_at';
     const offset = paginationQuery.getOffset();
-    
-    // Get paginated data with count
-    const { data, count } = await this.supabaseService.selectWithCount(
-      'employee',
-      columns,
-      {},
-      paginationQuery.sortBy,
-      paginationQuery.sortDirection,
-      paginationQuery.pageSize,
-      offset
-    );
 
-    const mappedData = data?.map(item => toCamelCase(item)) || [];
-    return new PaginatedResponseDto(mappedData, count || 0, paginationQuery.page, paginationQuery.pageSize);
+    // Get paginated data with count
+    const { data, count } =
+      await this.supabaseService.selectWithCount<Employee>(
+        'employee',
+        columns,
+        {},
+        paginationQuery.sortBy,
+        paginationQuery.sortDirection,
+        paginationQuery.pageSize,
+        offset,
+      );
+
+    const mappedData = data?.map((item) => toCamelCase(item)) || [];
+    return new PaginatedResponseDto(
+      mappedData,
+      count || 0,
+      paginationQuery.page,
+      paginationQuery.pageSize,
+    );
   }
 
   /**
    * Get employee by ID
    */
   async findOne(id: number): Promise<EmployeeDto> {
-    const employees = await this.supabaseService.select(
+    const employees = await this.supabaseService.select<Employee>(
       'employees',
       'id, employee_id, full_name, unit_id, department_id, role_id, is_technician, created_by, updated_by, created_at, updated_at',
       { id },
@@ -51,7 +68,7 @@ export class EmployeesService {
    * Find employees by unit ID
    */
   async findByUnitId(unitId: number): Promise<EmployeeDto[]> {
-    const employees = await this.supabaseService.select(
+    const employees = await this.supabaseService.select<Employee>(
       'employees',
       'id, employee_id, full_name, unit_id, department_id, role_id, is_technician, created_by, updated_by, created_at, updated_at',
       { unit_id: unitId },
@@ -64,7 +81,7 @@ export class EmployeesService {
    * Find employees by department ID
    */
   async findByDepartmentId(departmentId: number): Promise<EmployeeDto[]> {
-    const employees = await this.supabaseService.select(
+    const employees = await this.supabaseService.select<Employee>(
       'employees',
       'id, employee_id, full_name, unit_id, department_id, role_id, is_technician, created_by, updated_by, created_at, updated_at',
       { department_id: departmentId },
@@ -77,7 +94,7 @@ export class EmployeesService {
    * Find employees by role ID
    */
   async findByRoleId(roleId: number): Promise<EmployeeDto[]> {
-    const employees = await this.supabaseService.select(
+    const employees = await this.supabaseService.select<Employee>(
       'employees',
       'id, employee_id, full_name, unit_id, department_id, role_id, is_technician, created_by, updated_by, created_at, updated_at',
       { role_id: roleId },
@@ -89,7 +106,10 @@ export class EmployeesService {
   /**
    * Create new employee
    */
-  async create(createEmployeeDto: CreateEmployeeDto, userId: number): Promise<EmployeeDto> {
+  async create(
+    createEmployeeDto: CreateEmployeeDto,
+    userId: number,
+  ): Promise<EmployeeDto> {
     const data = {
       employee_id: createEmployeeDto.employeeId,
       full_name: createEmployeeDto.fullName,
@@ -101,7 +121,10 @@ export class EmployeesService {
       updated_by: userId,
     };
 
-    const result = await this.supabaseService.insert('employees', data);
+    const result = await this.supabaseService.insert<Employee>(
+      'employees',
+      data,
+    );
 
     if (!result || result.length === 0) {
       throw new Error('Failed to create employee');
@@ -113,20 +136,32 @@ export class EmployeesService {
   /**
    * Update employee
    */
-  async update(id: number, updateEmployeeDto: UpdateEmployeeDto, userId: number): Promise<EmployeeDto> {
+  async update(
+    id: number,
+    updateEmployeeDto: UpdateEmployeeDto,
+    userId: number,
+  ): Promise<EmployeeDto> {
     // First verify employee exists
     await this.findOne(id);
 
     const data: any = {};
-    if (updateEmployeeDto.employeeId) data.employee_id = updateEmployeeDto.employeeId;
+    if (updateEmployeeDto.employeeId)
+      data.employee_id = updateEmployeeDto.employeeId;
     if (updateEmployeeDto.fullName) data.full_name = updateEmployeeDto.fullName;
     if (updateEmployeeDto.unitId) data.unit_id = updateEmployeeDto.unitId;
-    if (updateEmployeeDto.departmentId) data.department_id = updateEmployeeDto.departmentId;
-    if (updateEmployeeDto.roleId !== undefined) data.role_id = updateEmployeeDto.roleId;
-    if (updateEmployeeDto.isTechnician !== undefined) data.is_technician = updateEmployeeDto.isTechnician;
+    if (updateEmployeeDto.departmentId)
+      data.department_id = updateEmployeeDto.departmentId;
+    if (updateEmployeeDto.roleId !== undefined)
+      data.role_id = updateEmployeeDto.roleId;
+    if (updateEmployeeDto.isTechnician !== undefined)
+      data.is_technician = updateEmployeeDto.isTechnician;
     data.updated_by = userId;
 
-    const result = await this.supabaseService.update('employees', data, { id });
+    const result = await this.supabaseService.update<Employee>(
+      'employees',
+      data,
+      { id },
+    );
 
     if (!result || result.length === 0) {
       throw new Error('Failed to update employee');
@@ -153,15 +188,15 @@ export class EmployeesService {
   /**
    * Helper to map database response to DTO
    */
-  private mapToEmployeeDto(employee: any): EmployeeDto {
+  private mapToEmployeeDto(employee: Employee): EmployeeDto {
     return {
       id: employee.id,
-      employeeId: employee.employee_id,
-      fullName: employee.full_name,
-      unitId: employee.unit_id,
+      employeeId: employee.person_id.toString(),
+      fullName: '',
+      unitId: employee.department_id,
       departmentId: employee.department_id,
-      roleId: employee.role_id || null,
-      isTechnician: employee.is_technician,
+      roleId: employee.person_id || null,
+      isTechnician: false,
       createdBy: employee.created_by || null,
       updatedBy: employee.updated_by || null,
       createdAt: employee.created_at,

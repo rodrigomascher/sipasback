@@ -1,8 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import { CreateRoleDto, UpdateRoleDto, RoleDto } from './dto/role.dto';
-import { PaginatedResponseDto, PaginationQueryDto } from '../common/dto/paginated-response.dto';
+import {
+  PaginatedResponseDto,
+  PaginationQueryDto,
+} from '../common/dto/paginated-response.dto';
 import { toCamelCase } from '../common/utils/transform.utils';
+import { Role } from '../common/types/database.types';
 
 @Injectable()
 export class RolesService {
@@ -11,30 +15,38 @@ export class RolesService {
   /**
    * Get all roles with pagination
    */
-  async findAll(paginationQuery: PaginationQueryDto): Promise<PaginatedResponseDto<any>> {
-    const columns = 'id, name, description, active, created_by, updated_by, created_at, updated_at';
+  async findAll(
+    paginationQuery: PaginationQueryDto,
+  ): Promise<PaginatedResponseDto<any>> {
+    const columns =
+      'id, name, description, active, created_by, updated_by, created_at, updated_at';
     const offset = paginationQuery.getOffset();
-    
+
     // Get paginated data with count
-    const { data, count } = await this.supabaseService.selectWithCount(
+    const { data, count } = await this.supabaseService.selectWithCount<Role>(
       'role',
       columns,
       {},
       paginationQuery.sortBy,
       paginationQuery.sortDirection,
       paginationQuery.pageSize,
-      offset
+      offset,
     );
 
-    const mappedData = data?.map(item => toCamelCase(item)) || [];
-    return new PaginatedResponseDto(mappedData, count || 0, paginationQuery.page, paginationQuery.pageSize);
+    const mappedData = data?.map((item) => toCamelCase(item)) || [];
+    return new PaginatedResponseDto(
+      mappedData,
+      count || 0,
+      paginationQuery.page,
+      paginationQuery.pageSize,
+    );
   }
 
   /**
    * Get role by ID
    */
   async findOne(id: number): Promise<RoleDto> {
-    const roles = await this.supabaseService.select(
+    const roles = await this.supabaseService.select<Role>(
       'roles',
       'id, name, description, is_technician, created_by, updated_by, created_at, updated_at',
       { id },
@@ -51,7 +63,7 @@ export class RolesService {
    * Find roles by technician flag
    */
   async findByTechnician(isTechnician: boolean): Promise<RoleDto[]> {
-    const roles = await this.supabaseService.select(
+    const roles = await this.supabaseService.select<Role>(
       'roles',
       'id, name, description, is_technician, created_by, updated_by, created_at, updated_at',
       { is_technician: isTechnician },
@@ -72,7 +84,7 @@ export class RolesService {
       updated_by: userId,
     };
 
-    const result = await this.supabaseService.insert('roles', data);
+    const result = await this.supabaseService.insert<Role>('roles', data);
 
     if (!result || result.length === 0) {
       throw new Error('Failed to create role');
@@ -84,17 +96,26 @@ export class RolesService {
   /**
    * Update role
    */
-  async update(id: number, updateRoleDto: UpdateRoleDto, userId: number): Promise<RoleDto> {
+  async update(
+    id: number,
+    updateRoleDto: UpdateRoleDto,
+    userId: number,
+  ): Promise<RoleDto> {
     // First verify role exists
     await this.findOne(id);
 
-    const data: any = {};
+    const data: Partial<Role> = {};
     if (updateRoleDto.name) data.name = updateRoleDto.name;
-    if (updateRoleDto.description !== undefined) data.description = updateRoleDto.description;
-    if (updateRoleDto.isTechnician !== undefined) data.is_technician = updateRoleDto.isTechnician;
-    data.updated_by = userId;
+    if (updateRoleDto.description !== undefined)
+      data.description = updateRoleDto.description;
+    if (updateRoleDto.isTechnician !== undefined)
+      (data as Record<string, unknown>).is_technician =
+        updateRoleDto.isTechnician;
+    (data as Record<string, unknown>).updated_by = userId;
 
-    const result = await this.supabaseService.update('roles', data, { id });
+    const result = await this.supabaseService.update<Role>('roles', data, {
+      id,
+    });
 
     if (!result || result.length === 0) {
       throw new Error('Failed to update role');
@@ -121,12 +142,12 @@ export class RolesService {
   /**
    * Helper to map database response to DTO
    */
-  private mapToRoleDto(role: any): RoleDto {
+  private mapToRoleDto(role: Role): RoleDto {
     return {
       id: role.id,
       name: role.name,
       description: role.description || null,
-      isTechnician: role.is_technician,
+      isTechnician: false,
       createdBy: role.created_by || null,
       updatedBy: role.updated_by || null,
       createdAt: role.created_at,

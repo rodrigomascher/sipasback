@@ -1,4 +1,12 @@
-import { IsOptional, IsString, IsNotEmpty, IsDateString, IsNumber, Matches, MinLength } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNotEmpty,
+  IsDateString,
+  IsNumber,
+  Matches,
+  MinLength,
+} from 'class-validator';
 
 export class CreatePersonDto {
   // Required fields
@@ -93,7 +101,9 @@ export class CreatePersonDto {
   // Documentation
   @IsOptional()
   @IsString()
-  @Matches(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, { message: 'CPF must be in format: 999.999.999-99' })
+  @Matches(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, {
+    message: 'CPF must be in format: 999.999.999-99',
+  })
   cpf?: string;
 
   @IsOptional()
@@ -118,7 +128,9 @@ export class CreatePersonDto {
 
   @IsOptional()
   @IsString()
-  @Matches(/^[A-Z]{2}$/, { message: 'State abbreviation must be 2 uppercase letters' })
+  @Matches(/^[A-Z]{2}$/, {
+    message: 'State abbreviation must be 2 uppercase letters',
+  })
   rgStateAbbr?: string;
 
   @IsOptional()

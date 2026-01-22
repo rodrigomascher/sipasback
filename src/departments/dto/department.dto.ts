@@ -1,4 +1,11 @@
-import { IsString, IsNumber, IsNotEmpty, IsOptional, MinLength, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsNotEmpty,
+  IsOptional,
+  MinLength,
+  MaxLength,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
@@ -22,7 +29,10 @@ export class CreateDepartmentDto {
  * DTO for updating a department
  */
 export class UpdateDepartmentDto {
-  @ApiPropertyOptional({ description: 'Department name', example: 'Engineering' })
+  @ApiPropertyOptional({
+    description: 'Department name',
+    example: 'Engineering',
+  })
   @IsString()
   @IsOptional()
   @MinLength(3)
@@ -48,15 +58,29 @@ export class DepartmentDto {
   @ApiProperty({ description: 'Unit ID', example: 1 })
   unitId: number;
 
-  @ApiPropertyOptional({ description: 'User ID who created this record', example: 1, nullable: true })
+  @ApiPropertyOptional({
+    description: 'User ID who created this record',
+    example: 1,
+    nullable: true,
+  })
   createdBy: number | null;
 
-  @ApiPropertyOptional({ description: 'User ID who last modified this record', example: 1, nullable: true })
+  @ApiPropertyOptional({
+    description: 'User ID who last modified this record',
+    example: 1,
+    nullable: true,
+  })
   updatedBy: number | null;
 
-  @ApiProperty({ description: 'Created timestamp', example: '2026-01-21T10:00:00Z' })
+  @ApiProperty({
+    description: 'Created timestamp',
+    example: '2026-01-21T10:00:00Z',
+  })
   createdAt: string;
 
-  @ApiProperty({ description: 'Updated timestamp', example: '2026-01-21T10:00:00Z' })
+  @ApiProperty({
+    description: 'Updated timestamp',
+    example: '2026-01-21T10:00:00Z',
+  })
   updatedAt: string;
 }

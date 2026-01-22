@@ -28,15 +28,15 @@ export class SupabaseService {
   /**
    * Select from a table with optional pagination and sorting
    */
-  async select(
+  async select<T>(
     table: string,
     columns = '*',
-    filters?: Record<string, any>,
+    filters?: Record<string, unknown>,
     sortBy?: string,
     sortDirection: 'asc' | 'desc' = 'asc',
     limit?: number,
-    offset?: number
-  ) {
+    offset?: number,
+  ): Promise<T[]> {
     let query: any = this.supabase.from(table).select(columns);
 
     if (filters && Object.keys(filters).length > 0) {
@@ -63,22 +63,24 @@ export class SupabaseService {
       throw new Error(`Supabase select error: ${error.message}`);
     }
 
-    return data;
+    return (data as T[]) || [];
   }
 
   /**
    * Select with count for pagination
    */
-  async selectWithCount(
+  async selectWithCount<T>(
     table: string,
     columns = '*',
-    filters?: Record<string, any>,
+    filters?: Record<string, unknown>,
     sortBy?: string,
     sortDirection: 'asc' | 'desc' = 'asc',
     limit?: number,
-    offset?: number
-  ) {
-    let query: any = this.supabase.from(table).select(columns, { count: 'exact' });
+    offset?: number,
+  ): Promise<{ data: T[]; count: number }> {
+    let query: any = this.supabase
+      .from(table)
+      .select(columns, { count: 'exact' });
 
     if (filters && Object.keys(filters).length > 0) {
       for (const [key, value] of Object.entries(filters)) {
@@ -104,13 +106,13 @@ export class SupabaseService {
       throw new Error(`Supabase select error: ${error.message}`);
     }
 
-    return { data, count };
+    return { data: (data as T[]) || [], count: count || 0 };
   }
 
   /**
    * Insert into a table
    */
-  async insert(table: string, data: any) {
+  async insert<T>(table: string, data: Partial<T>): Promise<T[]> {
     const { data: result, error } = await this.supabase
       .from(table)
       .insert([data])
@@ -120,13 +122,17 @@ export class SupabaseService {
       throw new Error(`Supabase insert error: ${error.message}`);
     }
 
-    return result;
+    return (result as T[]) || [];
   }
 
   /**
    * Update a table
    */
-  async update(table: string, data: any, filters: Record<string, any>) {
+  async update<T>(
+    table: string,
+    data: Partial<T>,
+    filters: Record<string, unknown>,
+  ): Promise<T[]> {
     let query: any = this.supabase.from(table).update(data);
 
     for (const [key, value] of Object.entries(filters)) {
@@ -139,13 +145,16 @@ export class SupabaseService {
       throw new Error(`Supabase update error: ${error.message}`);
     }
 
-    return result;
+    return (result as T[]) || [];
   }
 
   /**
    * Delete from a table
    */
-  async delete(table: string, filters: Record<string, any>) {
+  async delete(
+    table: string,
+    filters: Record<string, unknown>,
+  ): Promise<boolean> {
     let query: any = this.supabase.from(table).delete();
 
     for (const [key, value] of Object.entries(filters)) {
@@ -164,7 +173,10 @@ export class SupabaseService {
   /**
    * Count records in a table
    */
-  async count(table: string, filters?: Record<string, any>) {
+  async count(
+    table: string,
+    filters?: Record<string, unknown>,
+  ): Promise<number> {
     let query = this.supabase
       .from(table)
       .select('*', { count: 'exact', head: true });
@@ -187,13 +199,16 @@ export class SupabaseService {
   /**
    * Raw SQL query (use with caution)
    */
-  async rpc(functionName: string, params?: Record<string, any>) {
+  async rpc<T>(
+    functionName: string,
+    params?: Record<string, unknown>,
+  ): Promise<T | null> {
     const { data, error } = await this.supabase.rpc(functionName, params);
 
     if (error) {
       throw new Error(`Supabase RPC error: ${error.message}`);
     }
 
-    return data;
+    return (data as T) || null;
   }
 }

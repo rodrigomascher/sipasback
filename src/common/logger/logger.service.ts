@@ -50,11 +50,7 @@ export class LoggerService {
   /**
    * Log de erro com stack trace
    */
-  logError(
-    context: LogContext,
-    error: Error | string,
-    stackTrace?: string,
-  ) {
+  logError(context: LogContext, error: Error | string, stackTrace?: string) {
     const timestamp = new Date();
     const errorMessage = typeof error === 'string' ? error : error.message;
     const stack = stackTrace || (error instanceof Error ? error.stack : '');
@@ -179,7 +175,9 @@ export class LoggerService {
       ? JSON.stringify(context.details)
       : 'No details';
 
-    const duration = context.duration ? ` | Duration: ${context.duration}ms` : '';
+    const duration = context.duration
+      ? ` | Duration: ${context.duration}ms`
+      : '';
 
     return `
 [${timestamp.toISOString()}] ${level} | ${context.module} | ${context.action}

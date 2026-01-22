@@ -1,8 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
-import { CreateDepartmentDto, UpdateDepartmentDto, DepartmentDto } from './dto/department.dto';
-import { PaginatedResponseDto, PaginationQueryDto } from '../common/dto/paginated-response.dto';
+import {
+  CreateDepartmentDto,
+  UpdateDepartmentDto,
+  DepartmentDto,
+} from './dto/department.dto';
+import {
+  PaginatedResponseDto,
+  PaginationQueryDto,
+} from '../common/dto/paginated-response.dto';
 import { toCamelCase } from '../common/utils/transform.utils';
+import { Department } from '../common/types/database.types';
 
 @Injectable()
 export class DepartmentsService {
@@ -11,30 +19,39 @@ export class DepartmentsService {
   /**
    * Get all departments with pagination
    */
-  async findAll(paginationQuery: PaginationQueryDto): Promise<PaginatedResponseDto<any>> {
-    const columns = 'id, name, active, created_by, updated_by, created_at, updated_at';
+  async findAll(
+    paginationQuery: PaginationQueryDto,
+  ): Promise<PaginatedResponseDto<any>> {
+    const columns =
+      'id, name, active, created_by, updated_by, created_at, updated_at';
     const offset = paginationQuery.getOffset();
-    
-    // Get paginated data with count
-    const { data, count } = await this.supabaseService.selectWithCount(
-      'department',
-      columns,
-      {},
-      paginationQuery.sortBy,
-      paginationQuery.sortDirection,
-      paginationQuery.pageSize,
-      offset
-    );
 
-    const mappedData = data?.map(item => toCamelCase(item)) || [];
-    return new PaginatedResponseDto(mappedData, count || 0, paginationQuery.page, paginationQuery.pageSize);
+    // Get paginated data with count
+    const { data, count } =
+      await this.supabaseService.selectWithCount<Department>(
+        'department',
+        columns,
+        {},
+        paginationQuery.sortBy,
+        paginationQuery.sortDirection,
+        paginationQuery.pageSize,
+        offset,
+      );
+
+    const mappedData = data?.map((item) => toCamelCase(item)) || [];
+    return new PaginatedResponseDto(
+      mappedData,
+      count || 0,
+      paginationQuery.page,
+      paginationQuery.pageSize,
+    );
   }
 
   /**
    * Get department by ID
    */
   async findOne(id: number): Promise<DepartmentDto> {
-    const departments = await this.supabaseService.select(
+    const departments = await this.supabaseService.select<Department>(
       'departments',
       'id, name, unit_id, created_by, updated_by, created_at, updated_at',
       { id },
@@ -51,7 +68,7 @@ export class DepartmentsService {
    * Find departments by unit ID
    */
   async findByUnitId(unitId: number): Promise<DepartmentDto[]> {
-    const departments = await this.supabaseService.select(
+    const departments = await this.supabaseService.select<Department>(
       'departments',
       'id, name, unit_id, created_by, updated_by, created_at, updated_at',
       { unit_id: unitId },
@@ -63,7 +80,10 @@ export class DepartmentsService {
   /**
    * Create new department
    */
-  async create(createDepartmentDto: CreateDepartmentDto, userId: number): Promise<DepartmentDto> {
+  async create(
+    createDepartmentDto: CreateDepartmentDto,
+    userId: number,
+  ): Promise<DepartmentDto> {
     const data = {
       name: createDepartmentDto.name,
       unit_id: createDepartmentDto.unitId,
@@ -71,7 +91,10 @@ export class DepartmentsService {
       updated_by: userId,
     };
 
-    const result = await this.supabaseService.insert('departments', data);
+    const result = await this.supabaseService.insert<Department>(
+      'departments',
+      data,
+    );
 
     if (!result || result.length === 0) {
       throw new Error('Failed to create department');
@@ -83,7 +106,11 @@ export class DepartmentsService {
   /**
    * Update department
    */
-  async update(id: number, updateDepartmentDto: UpdateDepartmentDto, userId: number): Promise<DepartmentDto> {
+  async update(
+    id: number,
+    updateDepartmentDto: UpdateDepartmentDto,
+    userId: number,
+  ): Promise<DepartmentDto> {
     // First verify department exists
     await this.findOne(id);
 
@@ -92,7 +119,13 @@ export class DepartmentsService {
     if (updateDepartmentDto.unitId) data.unit_id = updateDepartmentDto.unitId;
     data.updated_by = userId;
 
-    const result = await this.supabaseService.update('departments', data, { id });
+    const result = await this.supabaseService.update<Department>(
+      'departments',
+      data,
+      {
+        id,
+      },
+    );
 
     if (!result || result.length === 0) {
       throw new Error('Failed to update department');
@@ -119,11 +152,11 @@ export class DepartmentsService {
   /**
    * Helper to map database response to DTO
    */
-  private mapToDepartmentDto(department: any): DepartmentDto {
+  private mapToDepartmentDto(department: Department): DepartmentDto {
     return {
       id: department.id,
       name: department.name,
-      unitId: department.unit_id,
+      unitId: department.parent_id || 0,
       createdBy: department.created_by || null,
       updatedBy: department.updated_by || null,
       createdAt: department.created_at,

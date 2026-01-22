@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
@@ -12,7 +16,8 @@ export class PersonsService {
    * Get all persons with optional search
    */
   async findAll(search?: string): Promise<Person[]> {
-    let query = 'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, nickname, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
+    const query =
+      'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, nickname, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
 
     const filters: Record<string, any> = {};
 
@@ -38,18 +43,22 @@ export class PersonsService {
 
     // Client-side filtering since Supabase doesn't support OR easily
     const term = searchTerm.toLowerCase();
-    return persons.filter((p: any) =>
-      p.first_name?.toLowerCase().includes(term) ||
-      p.last_name?.toLowerCase().includes(term) ||
-      p.cpf?.includes(searchTerm)
-    ).map(p => this.mapPerson(p));
+    return persons
+      .filter(
+        (p: any) =>
+          p.first_name?.toLowerCase().includes(term) ||
+          p.last_name?.toLowerCase().includes(term) ||
+          p.cpf?.includes(searchTerm),
+      )
+      .map((p) => this.mapPerson(p));
   }
 
   /**
    * Get person by ID
    */
   async findOne(id: number): Promise<Person> {
-    const query = 'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, nickname, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
+    const query =
+      'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, nickname, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
 
     const persons = await this.supabaseService.select('person', query, { id });
 
@@ -66,9 +75,13 @@ export class PersonsService {
   async create(createPersonDto: CreatePersonDto): Promise<Person> {
     // Check for duplicate CPF if provided
     if (createPersonDto.cpf) {
-      const existing = await this.supabaseService.select('person', 'id', { cpf: createPersonDto.cpf });
+      const existing = await this.supabaseService.select('person', 'id', {
+        cpf: createPersonDto.cpf,
+      });
       if (existing && existing.length > 0) {
-        throw new ConflictException(`Person with CPF ${createPersonDto.cpf} already exists`);
+        throw new ConflictException(
+          `Person with CPF ${createPersonDto.cpf} already exists`,
+        );
       }
     }
 
@@ -88,9 +101,13 @@ export class PersonsService {
 
     // Check for duplicate CPF (if cpf is being updated)
     if (updatePersonDto.cpf) {
-      const existing = await this.supabaseService.select('person', 'id', { cpf: updatePersonDto.cpf });
-      if (existing && existing.length > 0 && existing[0].id !== id) {
-        throw new ConflictException(`Person with CPF ${updatePersonDto.cpf} already exists`);
+      const existing = await this.supabaseService.select('person', 'id', {
+        cpf: updatePersonDto.cpf,
+      });
+      if (existing && existing.length > 0 && (existing[0] as any).id !== id) {
+        throw new ConflictException(
+          `Person with CPF ${updatePersonDto.cpf} already exists`,
+        );
       }
     }
 
@@ -113,10 +130,12 @@ export class PersonsService {
   /**
    * Convert DTO to database format (camelCase to snake_case)
    */
-  private dtoToData(dto: CreatePersonDto | UpdatePersonDto): Record<string, any> {
+  private dtoToData(
+    dto: CreatePersonDto | UpdatePersonDto,
+  ): Record<string, any> {
     const data: Record<string, any> = {};
 
-    Object.keys(dto).forEach(key => {
+    Object.keys(dto).forEach((key) => {
       const snakeKey = this.camelToSnake(key);
       data[snakeKey] = (dto as any)[key];
     });
@@ -130,7 +149,7 @@ export class PersonsService {
   private mapPerson(data: any): Person {
     const person = new Person();
 
-    Object.keys(data).forEach(key => {
+    Object.keys(data).forEach((key) => {
       const camelKey = this.snakeToCamel(key);
       (person as any)[camelKey] = data[key];
     });
@@ -142,14 +161,14 @@ export class PersonsService {
    * Map multiple database results to Person entities
    */
   private mapPersons(data: any[]): Person[] {
-    return data.map(item => this.mapPerson(item));
+    return data.map((item) => this.mapPerson(item));
   }
 
   /**
    * Convert camelCase to snake_case
    */
   private camelToSnake(str: string): string {
-    return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
   }
 
   /**

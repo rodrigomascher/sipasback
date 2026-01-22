@@ -34,7 +34,7 @@ export class PaginationQueryDto {
       this.page = Math.max(1, data.page || 1);
       this.pageSize = Math.min(100, Math.max(1, data.pageSize || 10));
       this.sortBy = data.sortBy;
-      this.sortDirection = (data.sortDirection === 'desc' ? 'desc' : 'asc');
+      this.sortDirection = data.sortDirection === 'desc' ? 'desc' : 'asc';
       this.search = data.search;
     }
   }

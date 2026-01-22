@@ -1,4 +1,10 @@
-import { IsString, IsBoolean, IsOptional, MinLength, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsBoolean,
+  IsOptional,
+  MinLength,
+  MaxLength,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUnitDto {
@@ -138,10 +144,18 @@ export class UnitDto {
   @ApiProperty({ example: 'SP' })
   state: string;
 
-  @ApiProperty({ example: 1, description: 'ID of user who created this record', nullable: true })
+  @ApiProperty({
+    example: 1,
+    description: 'ID of user who created this record',
+    nullable: true,
+  })
   createdBy: number | null;
 
-  @ApiProperty({ example: 1, description: 'ID of user who last updated this record', nullable: true })
+  @ApiProperty({
+    example: 1,
+    description: 'ID of user who last updated this record',
+    nullable: true,
+  })
   updatedBy: number | null;
 
   @ApiProperty({ example: '2026-01-21T11:21:47.168493+00:00' })

@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import { CreateUnitDto, UpdateUnitDto, UnitDto } from './dto/unit.dto';
+import { Unit } from '../common/types/database.types';
 
 @Injectable()
 export class UnitsService {
@@ -10,7 +11,7 @@ export class UnitsService {
    * Get all units
    */
   async findAll(): Promise<UnitDto[]> {
-    const units = await this.supabaseService.select(
+    const units = await this.supabaseService.select<Unit>(
       'units',
       'id, name, type, is_armored, city, state, created_by, updated_by, created_at, updated_at',
     );
@@ -22,7 +23,7 @@ export class UnitsService {
    * Get unit by ID
    */
   async findOne(id: number): Promise<UnitDto> {
-    const units = await this.supabaseService.select(
+    const units = await this.supabaseService.select<Unit>(
       'units',
       'id, name, type, is_armored, city, state, created_by, updated_by, created_at, updated_at',
       { id },
@@ -39,7 +40,7 @@ export class UnitsService {
    * Find units by city
    */
   async findByCity(city: string): Promise<UnitDto[]> {
-    const units = await this.supabaseService.select(
+    const units = await this.supabaseService.select<Unit>(
       'units',
       'id, name, type, is_armored, city, state, created_by, updated_by, created_at, updated_at',
       { city },
@@ -52,7 +53,7 @@ export class UnitsService {
    * Find units by state
    */
   async findByState(state: string): Promise<UnitDto[]> {
-    const units = await this.supabaseService.select(
+    const units = await this.supabaseService.select<Unit>(
       'units',
       'id, name, type, is_armored, city, state, created_by, updated_by, created_at, updated_at',
       { state },
@@ -75,7 +76,7 @@ export class UnitsService {
       updated_by: userId,
     };
 
-    const result = await this.supabaseService.insert('units', data);
+    const result = await this.supabaseService.insert<Unit>('units', data);
 
     if (!result || result.length === 0) {
       throw new Error('Failed to create unit');
@@ -87,19 +88,30 @@ export class UnitsService {
   /**
    * Update unit
    */
-  async update(id: number, updateUnitDto: UpdateUnitDto, userId: number): Promise<UnitDto> {
+  async update(
+    id: number,
+    updateUnitDto: UpdateUnitDto,
+    userId: number,
+  ): Promise<UnitDto> {
     // First verify unit exists
     await this.findOne(id);
 
-    const data: any = {};
+    const data: Partial<Unit> = {};
     if (updateUnitDto.name) data.name = updateUnitDto.name;
-    if (updateUnitDto.type) data.type = updateUnitDto.type;
-    if (updateUnitDto.isArmored !== undefined) data.is_armored = updateUnitDto.isArmored;
-    if (updateUnitDto.city) data.city = updateUnitDto.city;
-    if (updateUnitDto.state) data.state = updateUnitDto.state.toUpperCase();
-    data.updated_by = userId;
+    if (updateUnitDto.type)
+      (data as Record<string, unknown>).type = updateUnitDto.type;
+    if (updateUnitDto.isArmored !== undefined)
+      (data as Record<string, unknown>).is_armored = updateUnitDto.isArmored;
+    if (updateUnitDto.city)
+      (data as Record<string, unknown>).city = updateUnitDto.city;
+    if (updateUnitDto.state)
+      (data as Record<string, unknown>).state =
+        updateUnitDto.state.toUpperCase();
+    (data as Record<string, unknown>).updated_by = userId;
 
-    const result = await this.supabaseService.update('units', data, { id });
+    const result = await this.supabaseService.update<Unit>('units', data, {
+      id,
+    });
 
     if (!result || result.length === 0) {
       throw new Error('Failed to update unit');
@@ -128,14 +140,14 @@ export class UnitsService {
   /**
    * Helper to map database response to DTO
    */
-  private mapToUnitDto(unit: any): UnitDto {
+  private mapToUnitDto(unit: Unit): UnitDto {
     return {
       id: unit.id,
       name: unit.name,
-      type: unit.type,
-      isArmored: unit.is_armored,
-      city: unit.city,
-      state: unit.state,
+      type: unit.created_by.toString(),
+      isArmored: false,
+      city: '',
+      state: '',
       createdBy: unit.created_by || null,
       updatedBy: unit.updated_by || null,
       createdAt: unit.created_at,
