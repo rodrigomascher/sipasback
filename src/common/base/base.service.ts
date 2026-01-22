@@ -84,7 +84,7 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
    * Create new item
    */
   async create(dto: CreateDto, userId?: number): Promise<T> {
-    const data = this.transformForDb(dto);
+    const data = await this.transformForDb(dto);
 
     // Add created_by and updated_by from authenticated user
     if (userId) {
@@ -116,7 +116,7 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
     // Verify item exists first
     await this.findOne(id);
 
-    const data = this.transformForDb(dto);
+    const data = await this.transformForDb(dto);
 
     // Add updated_by from authenticated user
     if (userId) {
@@ -176,5 +176,5 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
    * Transform DTO to database format
    * Override in subclass to add custom transformation logic
    */
-  protected abstract transformForDb(dto: CreateDto | UpdateDto): any;
+  protected abstract transformForDb(dto: CreateDto | UpdateDto): Promise<any> | any;
 }

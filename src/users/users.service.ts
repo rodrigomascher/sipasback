@@ -48,7 +48,7 @@ export class UsersService extends BaseService<
     };
   }
 
-  protected transformForDb(dto: CreateUserDto | UpdateUserDto): any {
+  protected async transformForDb(dto: CreateUserDto | UpdateUserDto): Promise<any> {
     const transformed: any = { ...dto };
     if (transformed.password) {
       transformed.password_hash = await this.authService.hashPassword(transformed.password);
