@@ -8,7 +8,4 @@ export class CreateSexualOrientationDto {
   @IsOptional()
   @IsBoolean()
   active?: boolean;
-
-  @IsNotEmpty()
-  createdBy: number;
 }

@@ -8,7 +8,4 @@ export class CreateGenderIdentityDto {
   @IsOptional()
   @IsBoolean()
   active?: boolean;
-
-  @IsNotEmpty()
-  createdBy: number;
 }
