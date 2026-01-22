@@ -32,13 +32,53 @@ export class SupabaseService {
     table: string,
     columns = '*',
     filters?: Record<string, any>,
-    isCount: boolean = false,
     sortBy?: string,
     sortDirection: 'asc' | 'desc' = 'asc',
     limit?: number,
     offset?: number
   ) {
-    let query: any = this.supabase.from(table).select(columns, { count: isCount ? 'exact' : undefined });
+    let query: any = this.supabase.from(table).select(columns);
+
+    if (filters && Object.keys(filters).length > 0) {
+      for (const [key, value] of Object.entries(filters)) {
+        query = query.eq(key, value);
+      }
+    }
+
+    if (sortBy) {
+      query = query.order(sortBy, { ascending: sortDirection === 'asc' });
+    }
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    if (offset !== undefined) {
+      query = query.range(offset, offset + (limit || 10) - 1);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      throw new Error(`Supabase select error: ${error.message}`);
+    }
+
+    return data;
+  }
+
+  /**
+   * Select with count for pagination
+   */
+  async selectWithCount(
+    table: string,
+    columns = '*',
+    filters?: Record<string, any>,
+    sortBy?: string,
+    sortDirection: 'asc' | 'desc' = 'asc',
+    limit?: number,
+    offset?: number
+  ) {
+    let query: any = this.supabase.from(table).select(columns, { count: 'exact' });
 
     if (filters && Object.keys(filters).length > 0) {
       for (const [key, value] of Object.entries(filters)) {
@@ -64,11 +104,7 @@ export class SupabaseService {
       throw new Error(`Supabase select error: ${error.message}`);
     }
 
-    if (isCount) {
-      return [{ count }];
-    }
-
-    return data;
+    return { data, count };
   }
 
   /**

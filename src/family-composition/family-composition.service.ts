@@ -59,26 +59,21 @@ export class FamilyCompositionService {
 
   async findAll(paginationQuery: PaginationQueryDto): Promise<PaginatedResponseDto<any>> {
     const columns = 'id_family_composition, id_person, id_relationship_degree, responsible, registration_date, created_by, created_at, updated_by, updated_at';
-    
-    // Get total count
-    const countResult = await this.supabaseService.select('family_composition', 'count(*)', {}, true);
-    const total = countResult?.[0]?.count || 0;
-
-    // Get paginated data
     const offset = paginationQuery.getOffset();
-    const result = await this.supabaseService.select(
+    
+    // Get paginated data with count
+    const { data, count } = await this.supabaseService.selectWithCount(
       'family_composition',
       columns,
       {},
-      false,
       paginationQuery.sortBy,
       paginationQuery.sortDirection,
       paginationQuery.pageSize,
       offset
     );
 
-    const data = result?.map(item => this.toCamelCase(item)) || [];
-    return new PaginatedResponseDto(data, total, paginationQuery.page, paginationQuery.pageSize);
+    const mappedData = data?.map(item => this.toCamelCase(item)) || [];
+    return new PaginatedResponseDto(mappedData, count || 0, paginationQuery.page, paginationQuery.pageSize);
   }
 
   async findByFamily(idFamilyComposition: number): Promise<FamilyCompositionDto[]> {
