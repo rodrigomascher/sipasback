@@ -8,6 +8,7 @@ import {
   Param,
   Query,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { PersonsService } from './persons.service';
 import { CreatePersonDto } from './dto/create-person.dto';
@@ -64,8 +65,13 @@ export class PersonsController {
    * POST /api/persons
    */
   @Post()
-  async create(@Body() createPersonDto: CreatePersonDto): Promise<Person> {
-    return this.personsService.create(createPersonDto);
+  @UseGuards(JwtAuthGuard)
+  async create(
+    @Body() createPersonDto: CreatePersonDto,
+    @Request() req: any,
+  ): Promise<Person> {
+    const userId = req.user.sub; // Extract user ID from JWT token
+    return this.personsService.create(createPersonDto, userId);
   }
 
   /**
@@ -73,11 +79,14 @@ export class PersonsController {
    * PUT /api/persons/:id
    */
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
   async update(
     @Param('id') id: string,
     @Body() updatePersonDto: UpdatePersonDto,
+    @Request() req: any,
   ): Promise<Person> {
-    return this.personsService.update(parseInt(id, 10), updatePersonDto);
+    const userId = req.user.sub; // Extract user ID from JWT token
+    return this.personsService.update(parseInt(id, 10), updatePersonDto, userId);
   }
 
   /**

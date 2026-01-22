@@ -20,11 +20,8 @@ export class CreatePersonDto {
   @MinLength(3)
   lastName: string;
 
-  @IsNotEmpty()
-  @IsNumber()
-  createdBy: number;
-
-  // System & Unit References
+  // System & Unit References (auto-populated by backend)
+  // createdBy will be set automatically from authenticated user
   @IsOptional()
   @IsNumber()
   createdUnitId?: number;

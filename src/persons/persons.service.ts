@@ -87,7 +87,7 @@ export class PersonsService {
   /**
    * Create a new person
    */
-  async create(createPersonDto: CreatePersonDto): Promise<Person> {
+  async create(createPersonDto: CreatePersonDto, userId: number): Promise<Person> {
     // Check for duplicate CPF if provided
     if (createPersonDto.cpf) {
       const existing = await this.supabaseService.select('person', 'id', {
@@ -102,6 +102,8 @@ export class PersonsService {
 
     const data = this.dtoToData(createPersonDto);
     data.created_at = new Date();
+    data.created_by = userId; // Automatically set from authenticated user
+    data.updated_by = userId; // Initially set to same as created_by
 
     const result = await this.supabaseService.insert('person', data);
     return this.mapPerson(result[0]);
@@ -110,7 +112,7 @@ export class PersonsService {
   /**
    * Update a person
    */
-  async update(id: number, updatePersonDto: UpdatePersonDto): Promise<Person> {
+  async update(id: number, updatePersonDto: UpdatePersonDto, userId: number): Promise<Person> {
     // Check if person exists
     await this.findOne(id);
 
@@ -128,6 +130,7 @@ export class PersonsService {
 
     const data = this.dtoToData(updatePersonDto);
     data.updated_at = new Date();
+    data.updated_by = userId; // Automatically set from authenticated user
 
     const result = await this.supabaseService.update('person', data, { id });
     return this.mapPerson(result[0]);
@@ -145,15 +148,11 @@ export class PersonsService {
   /**
    * Convert DTO to database format (camelCase to snake_case)
    * Filters out null/undefined values and empty strings for numeric and date fields
-   * but preserves required fields like createdBy and updatedBy
    */
   private dtoToData(
     dto: CreatePersonDto | UpdatePersonDto,
   ): Record<string, any> {
     const data: Record<string, any> = {};
-    
-    // Required fields that should never be filtered out
-    const requiredFields = new Set(['createdBy', 'updatedBy']);
     
     const numericFields = new Set([
       'sex', 'genderId', 'genderIdentityId', 'raceId', 'ethnicityId', 'communityId',
@@ -172,17 +171,7 @@ export class PersonsService {
     Object.keys(dto).forEach((key) => {
       const value = (dto as any)[key];
       
-      // For required fields, only skip if they're explicitly null/undefined
-      if (requiredFields.has(key)) {
-        if (value === null || value === undefined) {
-          throw new Error(`Required field "${key}" cannot be null or undefined`);
-        }
-        const snakeKey = this.camelToSnake(key);
-        data[snakeKey] = value;
-        return;
-      }
-      
-      // Skip undefined and null values for optional fields
+      // Skip undefined and null values
       if (value === undefined || value === null) {
         return;
       }
