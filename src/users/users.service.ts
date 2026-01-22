@@ -9,6 +9,8 @@ export interface UserDto {
   id: number;
   email: string;
   name: string;
+  is_active?: boolean;
+  last_login?: Date;
   createdAt: Date;
   units?: any[];
 }
@@ -24,6 +26,7 @@ export class UpdateUserDto {
   email?: string;
   password?: string;
   name?: string;
+  is_active?: boolean;
   unitIds?: number[];
 }
 
@@ -34,7 +37,7 @@ export class UsersService extends BaseService<
   UpdateUserDto
 > {
   protected tableName = 'users';
-  protected columns = 'id, email, name, created_at';
+  protected columns = 'id, email, name, is_active, last_login, created_at';
 
   constructor(
     supabaseService: SupabaseService,
@@ -49,6 +52,8 @@ export class UsersService extends BaseService<
       id: data.id,
       email: data.email,
       name: data.name,
+      is_active: data.is_active,
+      last_login: data.last_login ? new Date(data.last_login) : undefined,
       createdAt: new Date(data.created_at),
     };
   }
