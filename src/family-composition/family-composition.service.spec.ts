@@ -79,7 +79,9 @@ describe('FamilyCompositionService (CRUD with Custom Methods)', () => {
 
   describe('CRUD - UPDATE', () => {
     it('should successfully update family composition', async () => {
-      const updateDto: UpdateFamilyCompositionDto = { relationship: 'ex-spouse' };
+      const updateDto: UpdateFamilyCompositionDto = {
+        relationship: 'ex-spouse',
+      };
       const updatedResult = {
         id: 1,
         familyId: 1,

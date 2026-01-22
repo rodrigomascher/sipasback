@@ -58,7 +58,12 @@ describe('UnitsController', () => {
     });
 
     it('should get a single unit by id', async () => {
-      const mockUnit = { id: 1, name: 'Unit A', city: 'São Paulo', state: 'SP' };
+      const mockUnit = {
+        id: 1,
+        name: 'Unit A',
+        city: 'São Paulo',
+        state: 'SP',
+      };
 
       mockUnitsService.findOne.mockResolvedValue(mockUnit);
 
@@ -86,7 +91,12 @@ describe('UnitsController', () => {
 
     it('should update a unit', async () => {
       const updateUnitDto: UpdateUnitDto = { name: 'Unit A Updated' };
-      const mockResult = { id: 1, name: 'Unit A Updated', city: 'São Paulo', state: 'SP' };
+      const mockResult = {
+        id: 1,
+        name: 'Unit A Updated',
+        city: 'São Paulo',
+        state: 'SP',
+      };
 
       mockUnitsService.update.mockResolvedValue(mockResult);
 

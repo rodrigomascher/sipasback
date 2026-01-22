@@ -36,9 +36,9 @@ describe('GendersService (CRUD Unit Tests)', () => {
   describe('CREATE', () => {
     it('should successfully create a new gender', async () => {
       const createDto: CreateGenderDto = { description: 'Outro' };
-      const mockResult = { 
-        id: 3, 
-        description: 'Outro', 
+      const mockResult = {
+        id: 3,
+        description: 'Outro',
         active: true,
         created_by: 1,
         updated_by: 1,
@@ -58,9 +58,9 @@ describe('GendersService (CRUD Unit Tests)', () => {
 
   describe('READ - findOne', () => {
     it('should retrieve a gender by id', async () => {
-      const mockGender = { 
-        id: 1, 
-        description: 'Masculino', 
+      const mockGender = {
+        id: 1,
+        description: 'Masculino',
         active: true,
         created_by: 1,
         updated_by: 1,
@@ -79,10 +79,12 @@ describe('GendersService (CRUD Unit Tests)', () => {
 
   describe('UPDATE', () => {
     it('should successfully update a gender', async () => {
-      const updateDto: UpdateGenderDto = { description: 'Masculino Atualizado' };
-      const updatedResult = { 
-        id: 1, 
-        description: 'Masculino Atualizado', 
+      const updateDto: UpdateGenderDto = {
+        description: 'Masculino Atualizado',
+      };
+      const updatedResult = {
+        id: 1,
+        description: 'Masculino Atualizado',
         active: true,
         created_by: 1,
         updated_by: 1,
@@ -90,11 +92,13 @@ describe('GendersService (CRUD Unit Tests)', () => {
         updated_at: new Date(),
       };
 
-      mockSupabaseService.select.mockResolvedValue([{ 
-        id: 1, 
-        description: 'Masculino', 
-        active: true 
-      }]);
+      mockSupabaseService.select.mockResolvedValue([
+        {
+          id: 1,
+          description: 'Masculino',
+          active: true,
+        },
+      ]);
       mockSupabaseService.update.mockResolvedValue([updatedResult]);
 
       const result = await service.update(1, updateDto);

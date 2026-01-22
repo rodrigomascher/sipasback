@@ -86,7 +86,13 @@ describe('BaseController', () => {
     it('should handle undefined pagination parameters with defaults', async () => {
       const spyFindAll = jest.spyOn(service, 'findAll');
 
-      const result = await controller.findAll(undefined, undefined, undefined, undefined, undefined);
+      const result = await controller.findAll(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      );
 
       expect(spyFindAll).toHaveBeenCalled();
       expect(result).toBeDefined();

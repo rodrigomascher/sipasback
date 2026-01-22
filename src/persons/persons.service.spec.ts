@@ -46,23 +46,27 @@ describe('PersonsService', () => {
       };
 
       const userId = 5;
-      const mockResult = [{
-        id: 1,
-        first_name: 'João',
-        last_name: 'Silva',
-        cpf: '123.456.789-00',
-        created_by: userId,
-        updated_by: userId,
-        created_at: new Date(),
-        updated_at: null,
-      }];
+      const mockResult = [
+        {
+          id: 1,
+          first_name: 'João',
+          last_name: 'Silva',
+          cpf: '123.456.789-00',
+          created_by: userId,
+          updated_by: userId,
+          created_at: new Date(),
+          updated_at: null,
+        },
+      ];
 
       mockSupabaseService.select.mockResolvedValue([]);
       mockSupabaseService.insert.mockResolvedValue(mockResult);
 
       const result = await service.create(createPersonDto, userId);
 
-      expect(mockSupabaseService.select).toHaveBeenCalledWith('person', 'id', { cpf: '123.456.789-00' });
+      expect(mockSupabaseService.select).toHaveBeenCalledWith('person', 'id', {
+        cpf: '123.456.789-00',
+      });
       expect(mockSupabaseService.insert).toHaveBeenCalled();
       expect(result.firstName).toBe('João');
       expect(result.lastName).toBe('Silva');
@@ -93,16 +97,18 @@ describe('PersonsService', () => {
       };
 
       const userId = 5;
-      const mockResult = [{
-        id: 1,
-        first_name: 'João',
-        last_name: 'Silva',
-        cpf: null,
-        created_by: userId,
-        updated_by: userId,
-        created_at: new Date(),
-        updated_at: null,
-      }];
+      const mockResult = [
+        {
+          id: 1,
+          first_name: 'João',
+          last_name: 'Silva',
+          cpf: null,
+          created_by: userId,
+          updated_by: userId,
+          created_at: new Date(),
+          updated_at: null,
+        },
+      ];
 
       mockSupabaseService.insert.mockResolvedValue(mockResult);
 
@@ -121,16 +127,18 @@ describe('PersonsService', () => {
       };
 
       const userId = 5;
-      const mockResult = [{
-        id: 2,
-        first_name: 'Maria',
-        last_name: 'Santos',
-        cpf: null, // Should be NULL in database
-        created_by: userId,
-        updated_by: userId,
-        created_at: new Date(),
-        updated_at: null,
-      }];
+      const mockResult = [
+        {
+          id: 2,
+          first_name: 'Maria',
+          last_name: 'Santos',
+          cpf: null, // Should be NULL in database
+          created_by: userId,
+          updated_by: userId,
+          created_at: new Date(),
+          updated_at: null,
+        },
+      ];
 
       mockSupabaseService.select.mockResolvedValue([]); // No CPF collision check needed for empty CPF
       mockSupabaseService.insert.mockResolvedValue(mockResult);
@@ -153,16 +161,18 @@ describe('PersonsService', () => {
         cpf: '',
       };
 
-      const mockResult1 = [{
-        id: 1,
-        first_name: 'Person',
-        last_name: 'One',
-        cpf: null,
-        created_by: userId,
-        updated_by: userId,
-        created_at: new Date(),
-        updated_at: null,
-      }];
+      const mockResult1 = [
+        {
+          id: 1,
+          first_name: 'Person',
+          last_name: 'One',
+          cpf: null,
+          created_by: userId,
+          updated_by: userId,
+          created_at: new Date(),
+          updated_at: null,
+        },
+      ];
 
       mockSupabaseService.select.mockResolvedValue([]);
       mockSupabaseService.insert.mockResolvedValue(mockResult1);
@@ -177,16 +187,18 @@ describe('PersonsService', () => {
         cpf: '',
       };
 
-      const mockResult2 = [{
-        id: 2,
-        first_name: 'Person',
-        last_name: 'Two',
-        cpf: null,
-        created_by: userId,
-        updated_by: userId,
-        created_at: new Date(),
-        updated_at: null,
-      }];
+      const mockResult2 = [
+        {
+          id: 2,
+          first_name: 'Person',
+          last_name: 'Two',
+          cpf: null,
+          created_by: userId,
+          updated_by: userId,
+          created_at: new Date(),
+          updated_at: null,
+        },
+      ];
 
       mockSupabaseService.insert.mockResolvedValue(mockResult2);
 
@@ -206,38 +218,47 @@ describe('PersonsService', () => {
         lastName: 'Santos',
       };
 
-      const fullQuery = 'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, social_name, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
+      const fullQuery =
+        'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, social_name, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
 
-      const existingPerson = [{
-        id: personId,
-        first_name: 'João',
-        last_name: 'Silva',
-        created_by: 5, // Original creator
-        updated_by: 5,
-      }];
+      const existingPerson = [
+        {
+          id: personId,
+          first_name: 'João',
+          last_name: 'Silva',
+          created_by: 5, // Original creator
+          updated_by: 5,
+        },
+      ];
 
-      const updatedPerson = [{
-        id: personId,
-        first_name: 'João',
-        last_name: 'Santos',
-        created_by: 5, // Should NOT change
-        updated_by: userId, // Should change
-        updated_at: new Date(),
-      }];
+      const updatedPerson = [
+        {
+          id: personId,
+          first_name: 'João',
+          last_name: 'Santos',
+          created_by: 5, // Should NOT change
+          updated_by: userId, // Should change
+          updated_at: new Date(),
+        },
+      ];
 
       mockSupabaseService.select.mockResolvedValue(existingPerson);
       mockSupabaseService.update.mockResolvedValue(updatedPerson);
 
       const result = await service.update(personId, updatePersonDto);
 
-      expect(mockSupabaseService.select).toHaveBeenCalledWith('person', fullQuery, { id: personId });
+      expect(mockSupabaseService.select).toHaveBeenCalledWith(
+        'person',
+        fullQuery,
+        { id: personId },
+      );
       expect(mockSupabaseService.update).toHaveBeenCalled();
-      
+
       const updateCall = mockSupabaseService.update.mock.calls[0];
       expect(updateCall[1].updated_by).toBeUndefined();
       expect(updateCall[1].last_name).toBe('Santos');
       expect(updateCall[1].created_by).toBeUndefined(); // Should NOT be in update data
-      
+
       expect(result.createdBy).toBe(5); // Original creator preserved
       expect(result.updatedBy).toBe(userId); // Updated to new user
     });
@@ -248,9 +269,9 @@ describe('PersonsService', () => {
 
       mockSupabaseService.select.mockResolvedValue([]);
 
-      await expect(service.update(personId, updatePersonDto, 6)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.update(personId, updatePersonDto, 6),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ConflictException if updated CPF already exists', async () => {
@@ -266,9 +287,9 @@ describe('PersonsService', () => {
         .mockResolvedValueOnce(existingPerson)
         .mockResolvedValueOnce(duplicateCpfPerson);
 
-      await expect(service.update(personId, updatePersonDto, 6)).rejects.toThrow(
-        ConflictException,
-      );
+      await expect(
+        service.update(personId, updatePersonDto, 6),
+      ).rejects.toThrow(ConflictException);
       expect(mockSupabaseService.update).not.toHaveBeenCalled();
     });
   });
@@ -320,7 +341,8 @@ describe('PersonsService', () => {
   describe('findOne', () => {
     it('should return a person by ID', async () => {
       const personId = 1;
-      const fullQuery = 'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, social_name, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
+      const fullQuery =
+        'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, social_name, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
       const mockPerson = [
         { id: personId, first_name: 'João', last_name: 'Silva' },
       ];
@@ -348,7 +370,8 @@ describe('PersonsService', () => {
   describe('remove', () => {
     it('should delete a person', async () => {
       const personId = 1;
-      const fullQuery = 'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, social_name, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
+      const fullQuery =
+        'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, social_name, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
       const mockPerson = [{ id: personId }];
 
       mockSupabaseService.select.mockResolvedValue(mockPerson);
@@ -377,9 +400,7 @@ describe('PersonsService', () => {
 
   describe('search', () => {
     it('should search persons by name', async () => {
-      const mockPersons = [
-        { id: 1, first_name: 'João', last_name: 'Silva' },
-      ];
+      const mockPersons = [{ id: 1, first_name: 'João', last_name: 'Silva' }];
 
       mockSupabaseService.select.mockResolvedValue(mockPersons);
 
@@ -399,7 +420,12 @@ describe('PersonsService', () => {
 
     it('should search by CPF', async () => {
       const mockPersons = [
-        { id: 1, cpf: '123.456.789-00', first_name: 'João', last_name: 'Silva' },
+        {
+          id: 1,
+          cpf: '123.456.789-00',
+          first_name: 'João',
+          last_name: 'Silva',
+        },
       ];
 
       mockSupabaseService.select.mockResolvedValue(mockPersons);
@@ -434,7 +460,12 @@ describe('PersonsService', () => {
 
     it('should search for NISN', async () => {
       const mockPersons = [
-        { id: 1, nisn: '987654321-00', first_name: 'Maria', last_name: 'Santos' },
+        {
+          id: 1,
+          nisn: '987654321-00',
+          first_name: 'Maria',
+          last_name: 'Santos',
+        },
       ];
 
       mockSupabaseService.select.mockResolvedValueOnce(mockPersons);
@@ -447,7 +478,12 @@ describe('PersonsService', () => {
 
     it('should return empty array if search term not found', async () => {
       const mockPersons = [
-        { id: 1, first_name: 'João', last_name: 'Silva', cpf: '111.111.111-11' },
+        {
+          id: 1,
+          first_name: 'João',
+          last_name: 'Silva',
+          cpf: '111.111.111-11',
+        },
       ];
 
       mockSupabaseService.select.mockResolvedValueOnce(mockPersons);
@@ -518,22 +554,27 @@ describe('PersonsService', () => {
         cpf: '', // Empty CPF should be converted to NULL
       };
 
-      const fullQuery = 'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, social_name, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
+      const fullQuery =
+        'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, social_name, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
 
-      const existingPerson = [{
-        id: personId,
-        first_name: 'João',
-        cpf: '123.456.789-00',
-        created_by: 5,
-        updated_by: 5,
-      }];
+      const existingPerson = [
+        {
+          id: personId,
+          first_name: 'João',
+          cpf: '123.456.789-00',
+          created_by: 5,
+          updated_by: 5,
+        },
+      ];
 
-      const updatedPerson = [{
-        id: personId,
-        first_name: 'João',
-        cpf: null,
-        updated_by: userId,
-      }];
+      const updatedPerson = [
+        {
+          id: personId,
+          first_name: 'João',
+          cpf: null,
+          updated_by: userId,
+        },
+      ];
 
       mockSupabaseService.select.mockResolvedValue(existingPerson);
       mockSupabaseService.update.mockResolvedValue(updatedPerson);
@@ -553,24 +594,29 @@ describe('PersonsService', () => {
         lastName: 'Santos',
       };
 
-      const fullQuery = 'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, social_name, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
+      const fullQuery =
+        'id, created_by, updated_by, created_unit_id, updated_unit_id, referred_unit_id, created_at, updated_at, notes, first_name, last_name, full_name, social_name, birth_date, sex, gender_id, gender_identity_id, sexual_orientation, race_id, ethnicity_id, community_id, marital_status_id, nationality, origin_country_id, arrival_date_brazil, mother_person_id, father_person_id, mother_rg, father_rg, mother_residence_order, father_residence_order, cpf, nis, nisn, sus_number, rg, rg_issuance_date, rg_state_abbr, rg_issuing_org_id, rg_complementary, photo_id, cert_standard_new, cert_term_number, cert_book, cert_page, cert_issuance_date, cert_state_abbr, cert_registry, cert_year, cert_issuing_org, birth_city, birth_subdistrict, voter_id_number, voter_id_zone, voter_id_section, voter_id_issuance_date, prof_card_number, prof_card_series, prof_card_issuance_date, prof_card_state, military_registration, military_issuance_date, military_reserve_number, income_type_id, monthly_income, annual_income, education_level_id, school_name, completion_year, currently_studying, deceased, death_cert_issuance_date, death_city, cemetery';
 
-      const existingPerson = [{
-        id: personId,
-        first_name: 'João',
-        last_name: 'Silva',
-        monthly_income: 5000,
-        created_by: 5,
-        updated_by: 5,
-      }];
+      const existingPerson = [
+        {
+          id: personId,
+          first_name: 'João',
+          last_name: 'Silva',
+          monthly_income: 5000,
+          created_by: 5,
+          updated_by: 5,
+        },
+      ];
 
-      const updatedPerson = [{
-        id: personId,
-        first_name: 'João',
-        last_name: 'Santos',
-        monthly_income: 5000, // Should remain unchanged
-        updated_by: userId,
-      }];
+      const updatedPerson = [
+        {
+          id: personId,
+          first_name: 'João',
+          last_name: 'Santos',
+          monthly_income: 5000, // Should remain unchanged
+          updated_by: userId,
+        },
+      ];
 
       mockSupabaseService.select.mockResolvedValue(existingPerson);
       mockSupabaseService.update.mockResolvedValue(updatedPerson);
@@ -600,23 +646,25 @@ describe('PersonsService', () => {
       };
 
       const userId = 5;
-      const mockResult = [{
-        id: 1,
-        first_name: 'João',
-        last_name: 'Silva',
-        cpf: '123.456.789-00',
-        birth_date: '1990-01-01',
-        sex: 'M',
-        gender_id: 1,
-        race_id: 2,
-        marital_status_id: 1,
-        monthly_income: 5000,
-        annual_income: 60000,
-        education_level_id: 5,
-        created_by: userId,
-        updated_by: userId,
-        created_at: new Date(),
-      }];
+      const mockResult = [
+        {
+          id: 1,
+          first_name: 'João',
+          last_name: 'Silva',
+          cpf: '123.456.789-00',
+          birth_date: '1990-01-01',
+          sex: 'M',
+          gender_id: 1,
+          race_id: 2,
+          marital_status_id: 1,
+          monthly_income: 5000,
+          annual_income: 60000,
+          education_level_id: 5,
+          created_by: userId,
+          updated_by: userId,
+          created_at: new Date(),
+        },
+      ];
 
       mockSupabaseService.select.mockResolvedValue([]);
       mockSupabaseService.insert.mockResolvedValue(mockResult);

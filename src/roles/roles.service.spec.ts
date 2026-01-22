@@ -35,12 +35,12 @@ describe('RolesService (CRUD with Custom Methods)', () => {
 
   describe('CRUD - CREATE', () => {
     it('should successfully create a new role', async () => {
-      const createDto: CreateRoleDto = { 
+      const createDto: CreateRoleDto = {
         name: 'Admin',
-        description: 'Administrator role'
+        description: 'Administrator role',
       };
-      const mockResult = { 
-        id: 1, 
+      const mockResult = {
+        id: 1,
         name: 'Admin',
         description: 'Administrator role',
         isTechnician: false,
@@ -59,8 +59,8 @@ describe('RolesService (CRUD with Custom Methods)', () => {
 
   describe('CRUD - READ (findOne)', () => {
     it('should retrieve a role by id', async () => {
-      const mockRole = { 
-        id: 1, 
+      const mockRole = {
+        id: 1,
         name: 'Admin',
         description: 'Administrator role',
         isTechnician: false,
@@ -79,8 +79,8 @@ describe('RolesService (CRUD with Custom Methods)', () => {
   describe('CRUD - UPDATE', () => {
     it('should successfully update a role', async () => {
       const updateDto: UpdateRoleDto = { name: 'Administrator' };
-      const updatedResult = { 
-        id: 1, 
+      const updatedResult = {
+        id: 1,
         name: 'Administrator',
         description: 'Administrator role',
         isTechnician: false,

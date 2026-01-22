@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FamilyCompositionController } from './family-composition.controller';
 import { FamilyCompositionService } from './family-composition.service';
-import { CreateFamilyCompositionDto, UpdateFamilyCompositionDto } from './dto/family-composition.dto';
+import {
+  CreateFamilyCompositionDto,
+  UpdateFamilyCompositionDto,
+} from './dto/family-composition.dto';
 
 describe('FamilyCompositionController (CRUD with Custom Methods)', () => {
   let controller: FamilyCompositionController;
@@ -26,7 +29,9 @@ describe('FamilyCompositionController (CRUD with Custom Methods)', () => {
       ],
     }).compile();
 
-    controller = module.get<FamilyCompositionController>(FamilyCompositionController);
+    controller = module.get<FamilyCompositionController>(
+      FamilyCompositionController,
+    );
     service = module.get<FamilyCompositionService>(FamilyCompositionService);
   });
 
@@ -82,7 +87,9 @@ describe('FamilyCompositionController (CRUD with Custom Methods)', () => {
     });
 
     it('should update family composition', async () => {
-      const updateDto: UpdateFamilyCompositionDto = { relationship: 'ex-spouse' };
+      const updateDto: UpdateFamilyCompositionDto = {
+        relationship: 'ex-spouse',
+      };
       const mockResult = {
         id: 1,
         familyId: 1,

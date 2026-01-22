@@ -40,8 +40,8 @@ describe('UnitsService (CRUD Unit Tests with Custom Methods)', () => {
         city: 'São Paulo',
         state: 'SP',
       };
-      const mockResult = { 
-        id: 1, 
+      const mockResult = {
+        id: 1,
         name: 'Unit A',
         city: 'São Paulo',
         state: 'SP',
@@ -60,8 +60,8 @@ describe('UnitsService (CRUD Unit Tests with Custom Methods)', () => {
 
   describe('CRUD - READ (findOne)', () => {
     it('should retrieve a unit by id', async () => {
-      const mockUnit = { 
-        id: 1, 
+      const mockUnit = {
+        id: 1,
         name: 'Unit A',
         city: 'São Paulo',
         state: 'SP',
@@ -80,8 +80,8 @@ describe('UnitsService (CRUD Unit Tests with Custom Methods)', () => {
   describe('CRUD - UPDATE', () => {
     it('should successfully update a unit', async () => {
       const updateDto: UpdateUnitDto = { name: 'Unit A Updated' };
-      const updatedResult = { 
-        id: 1, 
+      const updatedResult = {
+        id: 1,
         name: 'Unit A Updated',
         city: 'São Paulo',
         state: 'SP',

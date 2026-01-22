@@ -87,14 +87,21 @@ describe('GendersController', () => {
   describe('update', () => {
     it('should update a gender', async () => {
       const updateGenderDto: UpdateGenderDto = { name: 'Masculino Atualizado' };
-      const mockResult = { id: 1, name: 'Masculino Atualizado', created_at: new Date() };
+      const mockResult = {
+        id: 1,
+        name: 'Masculino Atualizado',
+        created_at: new Date(),
+      };
 
       mockGendersService.update.mockResolvedValue(mockResult);
 
       const result = await controller.update('1', updateGenderDto);
 
       expect(result).toEqual(mockResult);
-      expect(mockGendersService.update).toHaveBeenCalledWith(1, updateGenderDto);
+      expect(mockGendersService.update).toHaveBeenCalledWith(
+        1,
+        updateGenderDto,
+      );
     });
   });
 });

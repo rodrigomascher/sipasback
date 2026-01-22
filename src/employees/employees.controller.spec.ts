@@ -119,9 +119,7 @@ describe('EmployeesController (CRUD with Custom Methods)', () => {
     });
 
     it('should find employees by department', async () => {
-      const mockEmployees = [
-        { id: 1, departmentId: 1, personId: 1 },
-      ];
+      const mockEmployees = [{ id: 1, departmentId: 1, personId: 1 }];
 
       mockEmployeesService.findByDepartmentId.mockResolvedValue(mockEmployees);
 

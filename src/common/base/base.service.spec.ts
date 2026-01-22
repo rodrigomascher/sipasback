@@ -138,7 +138,7 @@ describe('BaseService', () => {
       expect(result).toEqual(mockResult);
       expect(mockSupabaseService.insert).toHaveBeenCalledWith(
         'test_table',
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
@@ -169,16 +169,16 @@ describe('BaseService', () => {
       expect(mockSupabaseService.update).toHaveBeenCalledWith(
         'test_table',
         expect.any(Object),
-        { id: 1 }
+        { id: 1 },
       );
     });
 
     it('should throw NotFoundException when record to update not found', async () => {
       mockSupabaseService.select.mockResolvedValue([]);
 
-      await expect(
-        service.update(999, { name: 'Updated' })
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update(999, { name: 'Updated' })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -192,10 +192,9 @@ describe('BaseService', () => {
 
       await service.remove(1);
 
-      expect(mockSupabaseService.delete).toHaveBeenCalledWith(
-        'test_table',
-        { id: 1 }
-      );
+      expect(mockSupabaseService.delete).toHaveBeenCalledWith('test_table', {
+        id: 1,
+      });
     });
 
     it('should throw NotFoundException when record to delete not found', async () => {

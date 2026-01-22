@@ -142,7 +142,7 @@ describe('DepartmentsService (CRUD with Custom Methods)', () => {
       const result = await service.findByUnitId(5);
 
       expect(result).toHaveLength(3);
-      expect(result.every(d => d.unitId === 5)).toBe(true);
+      expect(result.every((d) => d.unitId === 5)).toBe(true);
     });
   });
 });
