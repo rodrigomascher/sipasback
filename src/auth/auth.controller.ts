@@ -149,6 +149,12 @@ export class AuthController {
         throw new UnauthorizedException('Invalid token');
       }
 
+      console.log('[SELECT-UNIT] Attempting to select unit:', {
+        userId: user.id,
+        unitId: selectUnitDto.unitId,
+        tokenUser: user,
+      });
+
       // Obter dados da unidade selecionada
       const result = await this.authService.selectUnit(user, selectUnitDto.unitId);
 
@@ -158,6 +164,7 @@ export class AuthController {
 
       return result;
     } catch (error) {
+      console.error('[SELECT-UNIT] Error:', error);
       this.logger.logError(
         {
           action: 'select-unit',

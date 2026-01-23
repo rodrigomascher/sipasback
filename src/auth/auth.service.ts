@@ -312,20 +312,28 @@ export class AuthService {
     user: any,
     unitId: number,
   ): Promise<{ access_token: string; token_type: string; expires_in: number; user: any }> {
+    console.log('[AUTH-SELECT-UNIT] Starting with:', { userId: user.id, unitId });
+
     // Verify user has access to this unit
+    console.log('[AUTH-SELECT-UNIT] Checking user_units for user:', user.id, 'unit:', unitId);
     const userUnit = await this.supabaseService.select('user_units', '*', {
       user_id: user.id,
       unit_id: unitId,
     });
+
+    console.log('[AUTH-SELECT-UNIT] user_units query result:', userUnit);
 
     if (!userUnit || userUnit.length === 0) {
       throw new Error('User does not have access to this unit');
     }
 
     // Buscar dados da unidade
+    console.log('[AUTH-SELECT-UNIT] Fetching unit data for:', unitId);
     const units = await this.supabaseService.select('units', '*', {
       id: unitId,
     });
+
+    console.log('[AUTH-SELECT-UNIT] units query result:', units);
 
     if (!units || units.length === 0) {
       throw new Error('Unit not found');
