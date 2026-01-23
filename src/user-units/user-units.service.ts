@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
+import { BaseService } from '../common/base/base.service';
+import { CreateUserUnitDto, UpdateUserUnitDto } from './dto';
 
 export interface UserUnit {
   id: number;
@@ -9,10 +11,36 @@ export interface UserUnit {
 }
 
 @Injectable()
-export class UserUnitsService {
-  private tableName = 'user_units';
+export class UserUnitsService extends BaseService<
+  UserUnit,
+  CreateUserUnitDto,
+  UpdateUserUnitDto
+> {
+  protected tableName = 'user_units';
+  protected columns =
+    'id, user_id as "userId", unit_id as "unitId", created_at as "createdAt"';
 
-  constructor(private supabaseService: SupabaseService) {}
+  constructor(supabaseService: SupabaseService) {
+    super(supabaseService);
+  }
+
+  protected mapData(data: any): UserUnit {
+    return {
+      id: data.id,
+      userId: data.userId || data.user_id,
+      unitId: data.unitId || data.unit_id,
+      createdAt: data.createdAt || data.created_at,
+    };
+  }
+
+  protected transformForDb(
+    dto: CreateUserUnitDto | UpdateUserUnitDto,
+  ): any {
+    return {
+      user_id: dto.userId,
+      unit_id: dto.unitId,
+    };
+  }
 
   /**
    * Get all units for a specific user
@@ -29,9 +57,8 @@ export class UserUnitsService {
     }
 
     // Fetch unit details for each unit_id
-    // Note: Supabase returns snake_case, so we access unit_id
     const unitIds = userUnits.map((uu) => uu.unit_id);
-    
+
     if (unitIds.length === 0) {
       return [];
     }
@@ -44,10 +71,12 @@ export class UserUnitsService {
     );
 
     // Filter and map units
-    const userUnits_ = units.filter((unit: any) => unitIds.includes(unit.id));
-    
+    const userUnitsFiltered = units.filter((unit: any) =>
+      unitIds.includes(unit.id),
+    );
+
     // Return units with camelCase keys
-    return userUnits_.map((unit: any) => ({
+    return userUnitsFiltered.map((unit: any) => ({
       id: unit.id,
       name: unit.name,
       type: unit.type,

@@ -1,11 +1,12 @@
 import { Controller, Post, Put, Get, Body, Param, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { UsersService, CreateUserDto, UpdateUserDto, ChangePasswordDto } from './users.service';
 import { BaseController } from '../common/base/base.controller';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import { PaginationQueryBuilder } from '../common/utils/pagination.builder';
 
 @ApiTags('users')
+@ApiBearerAuth('access-token')
 @Controller('users')
 export class UsersController extends BaseController<
   any,
@@ -17,6 +18,14 @@ export class UsersController extends BaseController<
   }
 
   @Get()
+  @ApiOperation({ summary: 'List all users with pagination', description: 'Retrieve a paginated list of all users' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
+  @ApiQuery({ name: 'pageSize', required: false, type: Number, description: 'Items per page (default: 10)' })
+  @ApiQuery({ name: 'sortBy', required: false, type: String, description: 'Field to sort by' })
+  @ApiQuery({ name: 'sortDirection', required: false, enum: ['asc', 'desc'], description: 'Sort direction' })
+  @ApiQuery({ name: 'search', required: false, type: String, description: 'Search term for email/name' })
+  @ApiResponse({ status: 200, description: 'List of users returned successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async findAll(
     @Query('page') page?: string | number,
     @Query('pageSize') pageSize?: string | number,
@@ -35,16 +44,27 @@ export class UsersController extends BaseController<
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get a specific user', description: 'Retrieve a user by ID with all associated units' })
+  @ApiParam({ name: 'id', type: Number, description: 'User ID' })
+  @ApiResponse({ status: 200, description: 'User retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   async findOne(@Param('id') id: string): Promise<any> {
     return this.usersService.findOneWithUnits(parseInt(id, 10));
   }
 
   @Post()
+  @ApiOperation({ summary: 'Create a new user', description: 'Create a new user with associated units' })
+  @ApiResponse({ status: 201, description: 'User created successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid input' })
   async create(@Body() dto: CreateUserDto, @GetUser() user: any): Promise<any> {
     return this.usersService.createWithUnits(dto, user?.userId);
   }
 
   @Put(':id')
+  @ApiOperation({ summary: 'Update a user', description: 'Update an existing user and their units' })
+  @ApiParam({ name: 'id', type: Number, description: 'User ID' })
+  @ApiResponse({ status: 200, description: 'User updated successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateUserDto,
@@ -54,6 +74,11 @@ export class UsersController extends BaseController<
   }
 
   @Post(':id/change-password')
+  @ApiOperation({ summary: 'Change user password', description: 'Change the password for a specific user' })
+  @ApiParam({ name: 'id', type: Number, description: 'User ID' })
+  @ApiResponse({ status: 200, description: 'Password changed successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid password' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   async changePassword(
     @Param('id') id: string,
     @Body() dto: ChangePasswordDto,

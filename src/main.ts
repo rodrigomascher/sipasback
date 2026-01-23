@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import * as dotenv from 'dotenv';
 
 // Load environment variables from .env
@@ -19,6 +20,9 @@ async function bootstrap() {
     }),
   );
 
+  // Apply global exception filter
+  app.useGlobalFilters(new GlobalExceptionFilter());
+
   // Configuração de CORS
   app.enableCors({
     origin: [
@@ -32,28 +36,64 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
-  // Configuração do Swagger
+  // Swagger configuration
   const config = new DocumentBuilder()
     .setTitle('SIPAS API')
-    .setDescription('API de autenticação e gestão de usuários')
-    .setVersion('1.0')
+    .setDescription(
+      'Sistema Integrado de Prontuário e Assistência Social - API Documentation',
+    )
+    .setVersion('1.0.0')
+    .setContact(
+      'SIPAS Team',
+      'https://github.com/sipas',
+      'support@sipas.local',
+    )
+    .setLicense(
+      'UNLICENSED',
+      'https://github.com/sipas',
+    )
+    .addServer('http://localhost:3000', 'Development')
     .addBearerAuth(
       {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
+        description: 'Enter JWT token',
       },
       'access-token',
     )
+    .addTag('auth', 'Authentication operations')
+    .addTag('users', 'User management operations')
+    .addTag('units', 'Unit management operations')
+    .addTag('genders', 'Gender management operations')
+    .addTag('employees', 'Employee management operations')
+    .addTag('persons', 'Person management operations')
+    .addTag('departments', 'Department management operations')
+    .addTag('roles', 'Role management operations')
+    .addTag('relationship-degrees', 'Relationship degree management operations')
+    .addTag('sexual-orientations', 'Sexual orientation management operations')
+    .addTag('gender-identities', 'Gender identity management operations')
+    .addTag('family-composition', 'Family composition management operations')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+      docExpansion: 'list',
+      filter: true,
+      showRequestHeaders: true,
+      operationsSorter: 'method',
+      tagsSorter: 'alpha',
+    },
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'SIPAS API Documentation',
+  });
 
   await app.listen(process.env.PORT ?? 3000, () => {
     console.log(`🚀 Server is running on port ${process.env.PORT ?? 3000}`);
     console.log(
-      `📚 Swagger is running on http://localhost:${process.env.PORT ?? 3000}/docs`,
+      `📚 Swagger is running on http://localhost:${process.env.PORT ?? 3000}/api/docs`,
     );
     console.log(
       `✅ Supabase connected: ${process.env.SUPABASE_URL ? 'YES' : 'NO'}`,
