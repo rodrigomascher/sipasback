@@ -12,7 +12,6 @@ describe('DepartmentsController (CRUD with Custom Methods)', () => {
     findAll: jest.fn(),
     findOne: jest.fn(),
     update: jest.fn(),
-    findByUnitId: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -88,30 +87,6 @@ describe('DepartmentsController (CRUD with Custom Methods)', () => {
       const result = await controller.update(1, updateDto, 1);
 
       expect(result).toEqual(mockResult);
-    });
-  });
-
-  describe('Custom Methods', () => {
-    it('should find departments by unit', async () => {
-      const mockDepartments = [
-        { id: 1, name: 'Engineering', unitId: 1 },
-        { id: 2, name: 'Sales', unitId: 1 },
-      ];
-
-      mockDepartmentsService.findByUnitId.mockResolvedValue(mockDepartments);
-
-      const result = await controller.findByUnitId(1);
-
-      expect(result).toEqual(mockDepartments);
-      expect(mockDepartmentsService.findByUnitId).toHaveBeenCalledWith(1);
-    });
-
-    it('should return empty array for unit with no departments', async () => {
-      mockDepartmentsService.findByUnitId.mockResolvedValue([]);
-
-      const result = await controller.findByUnitId(999);
-
-      expect(result).toEqual([]);
     });
   });
 });

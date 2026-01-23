@@ -1,6 +1,6 @@
 import { Controller, Post, Put, Get, Body, Param, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { UsersService, CreateUserDto, UpdateUserDto } from './users.service';
+import { UsersService, CreateUserDto, UpdateUserDto, ChangePasswordDto } from './users.service';
 import { BaseController } from '../common/base/base.controller';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import { PaginationQueryBuilder } from '../common/utils/pagination.builder';
@@ -51,5 +51,14 @@ export class UsersController extends BaseController<
     @GetUser() user: any,
   ): Promise<any> {
     return this.usersService.updateWithUnits(parseInt(id, 10), dto, user?.userId);
+  }
+
+  @Post(':id/change-password')
+  async changePassword(
+    @Param('id') id: string,
+    @Body() dto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
+    await this.usersService.changePassword(parseInt(id, 10), dto);
+    return { message: 'Password changed successfully' };
   }
 }

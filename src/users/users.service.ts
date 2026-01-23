@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { IsString, IsNotEmpty, MinLength } from 'class-validator';
 import { SupabaseService } from '../database/supabase.service';
 import { BaseService } from '../common/base/base.service';
 import { User } from '../common/types/database.types';
@@ -28,6 +29,13 @@ export class UpdateUserDto {
   name?: string;
   isActive?: boolean;
   unitIds?: number[];
+}
+
+export class ChangePasswordDto {
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(6)
+  password: string;
 }
 
 @Injectable()
@@ -165,6 +173,23 @@ export class UsersService extends BaseService<
       ...paginatedResult,
       data: dataWithUnits,
     };
+  }
+
+  /**
+   * Change password for a user
+   */
+  async changePassword(id: number, dto: ChangePasswordDto): Promise<void> {
+    if (!dto.password) {
+      throw new Error('Password is required');
+    }
+    
+    const passwordHash = await this.authService.hashPassword(dto.password);
+    
+    await this.supabaseService.update(
+      this.tableName,
+      { password_hash: passwordHash },
+      { id }
+    );
   }
 }
 

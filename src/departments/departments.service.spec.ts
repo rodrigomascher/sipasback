@@ -105,44 +105,4 @@ describe('DepartmentsService (CRUD with Custom Methods)', () => {
       expect(result).toBe(4);
     });
   });
-
-  describe('CUSTOM METHOD - findByUnitId', () => {
-    it('should return departments from a specific unit', async () => {
-      const mockDepartments = [
-        { id: 1, name: 'Engineering', unitId: 1 },
-        { id: 2, name: 'Sales', unitId: 1 },
-      ];
-
-      mockSupabaseService.select.mockResolvedValue(mockDepartments);
-
-      const result = await service.findByUnitId(1);
-
-      expect(result).toHaveLength(2);
-      expect(result[0].unitId).toBe(1);
-      expect(result[1].unitId).toBe(1);
-    });
-
-    it('should return empty array for unit with no departments', async () => {
-      mockSupabaseService.select.mockResolvedValue([]);
-
-      const result = await service.findByUnitId(999);
-
-      expect(result).toEqual([]);
-    });
-
-    it('should handle multiple departments from same unit', async () => {
-      const mockDepartments = Array.from({ length: 3 }, (_, i) => ({
-        id: i + 1,
-        name: `Dept ${i + 1}`,
-        unitId: 5,
-      }));
-
-      mockSupabaseService.select.mockResolvedValue(mockDepartments);
-
-      const result = await service.findByUnitId(5);
-
-      expect(result).toHaveLength(3);
-      expect(result.every((d) => d.unitId === 5)).toBe(true);
-    });
-  });
 });

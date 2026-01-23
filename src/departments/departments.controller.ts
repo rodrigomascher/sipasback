@@ -15,10 +15,4 @@ export class DepartmentsController extends BaseController<
   constructor(departmentsService: DepartmentsService) {
     super(departmentsService);
   }
-
-  @Get('search/unit/:unitId')
-  @ApiCrudOperation('Find departments by unit ID')
-  async findByUnitId(@Param('unitId') unitId: string) {
-    return this.service.findByUnitId(Number(unitId));
-  }
 }
