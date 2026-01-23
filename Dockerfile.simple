@@ -1,0 +1,39 @@
+# Multi-stage build
+FROM node:20-alpine as dependencies
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Build stage
+FROM node:20-alpine as builder
+WORKDIR /app
+COPY package*.json ./
+COPY tsconfig*.json nest-cli.json ./
+COPY src ./src
+RUN npm ci
+RUN npm run build
+
+# Runtime stage
+FROM node:20-alpine
+WORKDIR /app
+
+# Install dumb-init for signal handling
+RUN apk add --no-cache dumb-init
+
+# Copy production dependencies from dependencies stage
+COPY --from=dependencies /app/node_modules ./node_modules
+
+# Copy built app from builder stage
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package*.json ./
+
+# Copy .env file if it exists
+COPY .env.production .env 2>/dev/null || true
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:3000/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["node", "dist/main.js"]

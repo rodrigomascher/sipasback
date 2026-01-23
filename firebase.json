@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "source": "dist",
+    "codebase": "default",
+    "runtime": "nodejs20",
+    "memory": 512,
+    "timeoutSeconds": 60,
+    "minInstances": 1
+  },
+  "emulators": {
+    "functions": {
+      "port": 5001
+    },
+    "hosting": {
+      "port": 5000
+    }  }
+}

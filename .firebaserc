@@ -1,0 +1,17 @@
+{
+  "projects": {
+    "default": "sipas-back"
+  },
+  "targets": {
+    "sipas-back": {
+      "hosting": {
+        "main": [
+          "sipas-web"
+        ]
+      }
+    }
+  },
+  "etags": {
+    "sipas-back": "xxx"
+  }
+}
