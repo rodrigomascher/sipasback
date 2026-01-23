@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IsString, IsNotEmpty, MinLength } from 'class-validator';
+import { IsString, IsNotEmpty, MinLength, IsEmail, IsOptional, IsBoolean, IsArray, IsNumber } from 'class-validator';
 import { SupabaseService } from '../database/supabase.service';
 import { BaseService } from '../common/base/base.service';
 import { User } from '../common/types/database.types';
@@ -17,17 +17,47 @@ export interface UserDto {
 }
 
 export class CreateUserDto {
+  @IsEmail()
   email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(6)
   password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(3)
   name: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true })
   unitIds?: number[];
 }
 
 export class UpdateUserDto {
+  @IsOptional()
+  @IsEmail()
   email?: string;
+
+  @IsOptional()
+  @IsString()
+  @MinLength(6)
   password?: string;
+
+  @IsOptional()
+  @IsString()
+  @MinLength(3)
   name?: string;
+
+  @IsOptional()
+  @IsBoolean()
   isActive?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true })
   unitIds?: number[];
 }
 
