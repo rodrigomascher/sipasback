@@ -312,6 +312,16 @@ export class AuthService {
     user: any,
     unitId: number,
   ): Promise<{ access_token: string; token_type: string; expires_in: number; user: any }> {
+    // Verify user has access to this unit
+    const userUnit = await this.supabaseService.select('user_units', '*', {
+      user_id: user.id,
+      unit_id: unitId,
+    });
+
+    if (!userUnit || userUnit.length === 0) {
+      throw new Error('User does not have access to this unit');
+    }
+
     // Buscar dados da unidade
     const units = await this.supabaseService.select('units', '*', {
       id: unitId,
