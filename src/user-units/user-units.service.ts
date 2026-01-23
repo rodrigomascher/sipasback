@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '../database/supabase.service';
 import { BaseService } from '../common/base/base.service';
 import { CreateUserUnitDto, UpdateUserUnitDto } from './dto';
+import { RelatedEntityPaginator, PaginatedRelatedEntities } from '../common/utils/related-entity-paginator';
 
 export interface UserUnit {
   id: number;
@@ -43,7 +44,7 @@ export class UserUnitsService extends BaseService<
   }
 
   /**
-   * Get all units for a specific user
+   * Get all units for a specific user (without pagination)
    */
   async getUnitsForUser(userId: number): Promise<any[]> {
     const userUnits = await this.supabaseService.select<any>(
@@ -83,6 +84,25 @@ export class UserUnitsService extends BaseService<
       city: unit.city,
       state: unit.state,
     }));
+  }
+
+  /**
+   * Get paginated units for a specific user
+   */
+  async getUnitsForUserPaginated(
+    userId: number,
+    paginationOptions?: {
+      page?: number;
+      pageSize?: number;
+      sortBy?: string;
+      sortDirection?: 'asc' | 'desc';
+    },
+  ): Promise<PaginatedRelatedEntities<any>> {
+    // Get all units for user
+    const units = await this.getUnitsForUser(userId);
+
+    // Apply pagination
+    return RelatedEntityPaginator.paginate(units, paginationOptions);
   }
 
   /**
