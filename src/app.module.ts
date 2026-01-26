@@ -15,6 +15,7 @@ import { SexualOrientationsModule } from './sexual-orientations/sexual-orientati
 import { RelationshipDegreesModule } from './relationship-degrees/relationship-degrees.module';
 import { FamilyCompositionModule } from './family-composition/family-composition.module';
 import { RacesModule } from './races/races.module';
+import { EthnicitiesModule } from './ethnicities/ethnicities.module';
 import { ExampleModule } from './example/example.module';
 import { LoggerModule } from './common/logger/logger.module';
 
@@ -34,6 +35,7 @@ import { LoggerModule } from './common/logger/logger.module';
     RelationshipDegreesModule,
     FamilyCompositionModule,
     RacesModule,
+    EthnicitiesModule,
     ExampleModule,
     LoggerModule,
   ],
