@@ -30,6 +30,13 @@ export interface SexualOrientation extends BaseEntity {
   updated_by: number | null;
 }
 
+export interface Race extends BaseEntity {
+  description: string;
+  active?: boolean;
+  created_by: number | null;
+  updated_by: number | null;
+}
+
 export interface Department extends BaseEntity {
   description: string;
   unit_id: number;
