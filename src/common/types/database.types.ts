@@ -44,6 +44,13 @@ export interface Ethnicity extends BaseEntity {
   updated_by: number | null;
 }
 
+export interface IncomeType extends BaseEntity {
+  description: string;
+  active?: boolean;
+  created_by: number | null;
+  updated_by: number | null;
+}
+
 export interface Department extends BaseEntity {
   description: string;
   unit_id: number;
