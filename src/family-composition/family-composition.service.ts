@@ -29,7 +29,7 @@ export class FamilyCompositionService extends BaseService<
 > {
   protected tableName = 'family_composition';
   protected columns =
-    'id_family_composition, id_person, id_relationship_degree, responsible, registration_date, created_by, created_at, updated_by, updated_at';
+    'id, id_family_composition, id_person, id_relationship_degree, responsible, registration_date, created_by, created_at, updated_by, updated_at';
 
   /**
    * Create a new FamilyCompositionService instance

@@ -22,6 +22,7 @@ CREATE INDEX idx_relationship_degree_active ON relationship_degree(active);
 
 -- Create family_composition table with composite primary key
 CREATE TABLE IF NOT EXISTS public.family_composition (
+  id SERIAL PRIMARY KEY,
   id_family_composition INTEGER NOT NULL,
   id_person INTEGER NOT NULL,
   id_relationship_degree INTEGER REFERENCES relationship_degree(id),
@@ -34,8 +35,8 @@ CREATE TABLE IF NOT EXISTS public.family_composition (
   updated_by VARCHAR(100),
   updated_at TIMESTAMP,
   
-  -- Composite primary key
-  PRIMARY KEY (id_family_composition, id_person),
+  -- Unique constraint for composite business key
+  UNIQUE (id_family_composition, id_person),
   
   -- Foreign key to person table (if exists)
   CONSTRAINT fk_person FOREIGN KEY (id_person) REFERENCES person(id) ON DELETE CASCADE
