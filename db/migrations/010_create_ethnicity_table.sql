@@ -3,7 +3,7 @@ CREATE TABLE ethnicity (
   id SERIAL PRIMARY KEY,
   description VARCHAR(100) NOT NULL UNIQUE,
   active BOOLEAN DEFAULT true,
-  created_by INTEGER NOT NULL,
+  created_by INTEGER,
   updated_by INTEGER,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
