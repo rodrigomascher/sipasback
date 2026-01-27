@@ -20,6 +20,7 @@ import { IncomeTypesModule } from './income-types/income-types.module';
 import { MaritalStatusesModule } from './marital-statuses/marital-statuses.module';
 import { ExampleModule } from './example/example.module';
 import { LoggerModule } from './common/logger/logger.module';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -44,6 +45,6 @@ import { LoggerModule } from './common/logger/logger.module';
     LoggerModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, JwtAuthGuard],
 })
 export class AppModule {}
