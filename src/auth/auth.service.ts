@@ -380,4 +380,53 @@ export class AuthService {
       },
     };
   }
+
+  /**
+   * Refresh JWT token
+   * Validates the refresh token and generates a new access token
+   */
+  refreshToken(refreshToken: string) {
+    try {
+      const payload = this.jwtService.verify(refreshToken, {
+        secret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+      });
+
+      const newAccessToken = this.jwtService.sign(
+        {
+          sub: payload.sub,
+          email: payload.email,
+          name: payload.name,
+          unitId: payload.unitId,
+          roleId: payload.roleId,
+        },
+        {
+          expiresIn: '1h',
+          secret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+        },
+      );
+
+      return {
+        access_token: newAccessToken,
+        token_type: 'Bearer',
+        expires_in: 3600,
+      };
+    } catch (error) {
+      throw new Error('Invalid or expired refresh token');
+    }
+  }
+
+  /**
+   * Validate JWT token
+   * Returns the decoded token payload if valid
+   */
+  validateToken(token: string) {
+    try {
+      const payload = this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+      });
+      return payload;
+    } catch (error) {
+      return null;
+    }
+  }
 }

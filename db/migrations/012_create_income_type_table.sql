@@ -13,7 +13,19 @@ CREATE INDEX idx_income_type_description ON income_type(description);
 
 -- Add foreign key to person table
 ALTER TABLE person
-ADD COLUMN IF NOT EXISTS income_type_id INTEGER,
-ADD CONSTRAINT IF NOT EXISTS fk_person_income_type_id FOREIGN KEY (income_type_id) REFERENCES income_type(id) ON DELETE SET NULL;
+ADD COLUMN IF NOT EXISTS income_type_id INTEGER;
+
+-- Add foreign key constraint (using DO block to check if it exists)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.table_constraints 
+    WHERE constraint_name = 'fk_person_income_type_id'
+  ) THEN
+    ALTER TABLE person
+    ADD CONSTRAINT fk_person_income_type_id 
+    FOREIGN KEY (income_type_id) REFERENCES income_type(id) ON DELETE SET NULL;
+  END IF;
+END $$;
 
 CREATE INDEX IF NOT EXISTS idx_person_income_type_id ON person(income_type_id);

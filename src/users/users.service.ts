@@ -226,17 +226,24 @@ export class UsersService extends BaseService<
    * Deactivate a user
    */
   async deactivateUser(id: number): Promise<any> {
-    const result = await this.supabaseService.update(
+    await this.supabaseService.update(
       this.tableName,
       { is_active: false },
       { id }
     );
     
-    if (!result || result.length === 0) {
+    // Fetch the updated user
+    const users = await this.supabaseService.select<User>(
+      this.tableName,
+      this.columns,
+      { id },
+    );
+    
+    if (!users || users.length === 0) {
       throw new Error(`User with ID ${id} not found`);
     }
     
-    return this.mapData(result[0]);
+    return this.mapData(users[0]);
   }
 }
 
