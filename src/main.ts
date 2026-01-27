@@ -3,6 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import * as dotenv from 'dotenv';
 
 // Load environment variables from .env
@@ -22,6 +23,9 @@ async function bootstrap() {
 
   // Apply global exception filter
   app.useGlobalFilters(new GlobalExceptionFilter());
+
+  // Apply global JWT auth guard
+  app.useGlobalGuards(app.get(JwtAuthGuard));
 
   // Configuração de CORS
   app.enableCors({

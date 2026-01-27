@@ -5,6 +5,7 @@ import { CreateGenderIdentityDto } from './dto/create-gender-identity.dto';
 import { UpdateGenderIdentityDto } from './dto/update-gender-identity.dto';
 import { BaseController } from '../common/base/base.controller';
 import { GetUser } from '../common/decorators/get-user.decorator';
+import { Public } from '../common/decorators/public.decorator';
 import { PaginationQueryBuilder } from '../common/utils/pagination.builder';
 
 @ApiTags('gender-identities')
@@ -16,6 +17,12 @@ export class GenderIdentitiesController extends BaseController<
 > {
   constructor(genderIdentitiesService: GenderIdentitiesService) {
     super(genderIdentitiesService);
+  }
+
+  @Get()
+  @Public()
+  findAll() {
+    return super.findAll();
   }
 
   @Get()
