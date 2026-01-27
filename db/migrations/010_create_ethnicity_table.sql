@@ -14,8 +14,8 @@ CREATE INDEX idx_ethnicity_active ON ethnicity(active);
 
 -- Add ethnicity_id column to person table
 ALTER TABLE person
-ADD COLUMN if not EXISTS ethnicity_id INTEGER,
-ADD CONSTRAINT fk_person_ethnicity_id FOREIGN KEY (ethnicity_id) REFERENCES ethnicity(id) ON DELETE SET NULL;
+ADD COLUMN IF NOT EXISTS ethnicity_id INTEGER,
+ADD CONSTRAINT IF NOT EXISTS fk_person_ethnicity_id FOREIGN KEY (ethnicity_id) REFERENCES ethnicity(id) ON DELETE SET NULL;
 
 -- Create index for ethnicity_id in person table
-CREATE INDEX idx_person_ethnicity_id ON person(ethnicity_id);
+CREATE INDEX IF NOT EXISTS idx_person_ethnicity_id ON person(ethnicity_id);

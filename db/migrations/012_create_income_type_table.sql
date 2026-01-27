@@ -12,7 +12,8 @@ CREATE INDEX idx_income_type_active ON income_type(active);
 CREATE INDEX idx_income_type_description ON income_type(description);
 
 -- Add foreign key to person table
-ALTER TABLE person 
-ADD COLUMN if NOT EXISTS income_type_id INTEGER REFERENCES income_type(id) ON DELETE SET NULL;
+ALTER TABLE person
+ADD COLUMN IF NOT EXISTS income_type_id INTEGER,
+ADD CONSTRAINT IF NOT EXISTS fk_person_income_type_id FOREIGN KEY (income_type_id) REFERENCES income_type(id) ON DELETE SET NULL;
 
-CREATE INDEX idx_person_income_type_id ON person(income_type_id);
+CREATE INDEX IF NOT EXISTS idx_person_income_type_id ON person(income_type_id);
