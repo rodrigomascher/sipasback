@@ -1,4 +1,4 @@
-import { Controller, Post, Put, Get, Body, Param, Query } from '@nestjs/common';
+import { Controller, Post, Put, Get, Delete, Body, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { UsersService, CreateUserDto, UpdateUserDto, ChangePasswordDto } from './users.service';
 import { BaseController } from '../common/base/base.controller';
@@ -52,6 +52,10 @@ export class UsersController extends BaseController<
     return this.usersService.findOneWithUnits(parseInt(id, 10));
   }
 
+  async findById(id: number): Promise<any> {
+    return this.usersService.findOneWithUnits(id);
+  }
+
   @Post()
   @ApiOperation({ summary: 'Create a new user', description: 'Create a new user with associated units' })
   @ApiResponse({ status: 201, description: 'User created successfully' })
@@ -71,6 +75,28 @@ export class UsersController extends BaseController<
     @GetUser() user: any,
   ): Promise<any> {
     return this.usersService.updateWithUnits(parseInt(id, 10), dto, user?.userId);
+  }
+
+  async updateUser(id: number, dto: UpdateUserDto): Promise<any> {
+    return this.usersService.updateWithUnits(id, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a user' })
+  @ApiParam({ name: 'id', type: Number, description: 'User ID' })
+  @ApiResponse({ status: 200, description: 'User deleted successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async delete(id: number): Promise<void> {
+    await this.usersService.delete(id);
+  }
+
+  @Post(':id/deactivate')
+  @ApiOperation({ summary: 'Deactivate a user' })
+  @ApiParam({ name: 'id', type: Number, description: 'User ID' })
+  @ApiResponse({ status: 200, description: 'User deactivated successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async deactivateUser(id: number): Promise<any> {
+    return this.usersService.deactivateUser(id);
   }
 
   @Post(':id/change-password')

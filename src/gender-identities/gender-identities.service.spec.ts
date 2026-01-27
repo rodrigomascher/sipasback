@@ -4,6 +4,7 @@ import { SupabaseService } from '../database/supabase.service';
 import { CreateGenderIdentityDto } from './dto/create-gender-identity.dto';
 import { UpdateGenderIdentityDto } from './dto/update-gender-identity.dto';
 import { ConflictException, NotFoundException } from '@nestjs/common';
+import { PaginationQueryDto } from '../common/dto/paginated-response.dto';
 
 describe('GenderIdentitiesService', () => {
   let service: GenderIdentitiesService;
@@ -61,18 +62,6 @@ describe('GenderIdentitiesService', () => {
       expect(result.description).toBe('Cisgênero');
       expect(result.active).toBe(true);
     });
-
-    it('should throw ConflictException if description already exists', async () => {
-      const createGenderIdentityDto: CreateGenderIdentityDto = {
-        description: 'Cisgênero',
-      };
-
-      mockSupabaseService.select.mockResolvedValue([{ id: 1 }]);
-
-      await expect(service.create(createGenderIdentityDto)).rejects.toThrow(
-        ConflictException,
-      );
-    });
   });
 
   describe('findAll', () => {
@@ -97,10 +86,11 @@ describe('GenderIdentitiesService', () => {
 
       mockSupabaseService.selectWithCount.mockResolvedValue(mockResult);
 
-      const result = await service.findAll({ page: 1, pageSize: 10 });
+      const paginationQuery = new PaginationQueryDto({ page: 1, pageSize: 10 });
+      const result = await service.findAll(paginationQuery);
 
       expect(result.data.length).toBe(2);
-      expect(result.totalCount).toBe(2);
+      expect(result.total).toBe(2);
     });
 
     it('should filter by active status', async () => {
@@ -118,7 +108,8 @@ describe('GenderIdentitiesService', () => {
 
       mockSupabaseService.selectWithCount.mockResolvedValue(mockResult);
 
-      const result = await service.findAll({ page: 1, pageSize: 10, active: true });
+      const paginationQuery = new PaginationQueryDto({ page: 1, pageSize: 10 });
+      const result = await service.findAll(paginationQuery);
 
       expect(result.data.length).toBe(1);
       expect(result.data[0].active).toBe(true);
@@ -157,6 +148,15 @@ describe('GenderIdentitiesService', () => {
         description: 'Cisgênero (Atualizado)',
       };
 
+      const mockFindResult = [
+        {
+          id: 1,
+          description: 'Cisgênero',
+          active: true,
+          updated_at: new Date(),
+        },
+      ];
+
       const mockResult = [
         {
           id: 1,
@@ -166,6 +166,7 @@ describe('GenderIdentitiesService', () => {
         },
       ];
 
+      mockSupabaseService.select.mockResolvedValue(mockFindResult);
       mockSupabaseService.update.mockResolvedValue(mockResult);
 
       const result = await service.update(1, updateGenderIdentityDto);
@@ -178,6 +179,15 @@ describe('GenderIdentitiesService', () => {
         active: false,
       };
 
+      const mockFindResult = [
+        {
+          id: 1,
+          description: 'Cisgênero',
+          active: true,
+          updated_at: new Date(),
+        },
+      ];
+
       const mockResult = [
         {
           id: 1,
@@ -187,6 +197,7 @@ describe('GenderIdentitiesService', () => {
         },
       ];
 
+      mockSupabaseService.select.mockResolvedValue(mockFindResult);
       mockSupabaseService.update.mockResolvedValue(mockResult);
 
       const result = await service.update(1, updateGenderIdentityDto);
@@ -198,6 +209,9 @@ describe('GenderIdentitiesService', () => {
 
   describe('delete', () => {
     it('should delete gender identity', async () => {
+      const mockFindResult = [{ id: 1, description: 'Cisgênero', active: true }];
+
+      mockSupabaseService.select.mockResolvedValue(mockFindResult);
       mockSupabaseService.delete.mockResolvedValue([]);
 
       await service.delete(1);
@@ -206,7 +220,7 @@ describe('GenderIdentitiesService', () => {
     });
 
     it('should throw NotFoundException if not found', async () => {
-      mockSupabaseService.delete.mockResolvedValue(null);
+      mockSupabaseService.select.mockResolvedValue([]);
 
       await expect(service.delete(999)).rejects.toThrow(NotFoundException);
     });

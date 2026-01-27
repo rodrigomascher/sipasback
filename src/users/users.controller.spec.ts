@@ -17,6 +17,9 @@ describe('UsersController', () => {
     changePassword: jest.fn(),
     deactivateUser: jest.fn(),
     findAllWithUnits: jest.fn(),
+    findOneWithUnits: jest.fn(),
+    createWithUnits: jest.fn(),
+    updateWithUnits: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -54,12 +57,12 @@ describe('UsersController', () => {
         createdAt: new Date(),
       };
 
-      mockUsersService.create.mockResolvedValue(mockUser);
+      mockUsersService.createWithUnits.mockResolvedValue(mockUser);
 
-      const result = await controller.create(createUserDto);
+      const result = await controller.create(createUserDto, { userId: 1 });
 
       expect(result).toEqual(mockUser);
-      expect(mockUsersService.create).toHaveBeenCalledWith(createUserDto);
+      expect(mockUsersService.createWithUnits).toHaveBeenCalledWith(createUserDto, 1);
     });
 
     it('should create user with associated units', async () => {
@@ -79,9 +82,9 @@ describe('UsersController', () => {
         units: [{ id: 1 }, { id: 2 }],
       };
 
-      mockUsersService.create.mockResolvedValue(mockUser);
+      mockUsersService.createWithUnits.mockResolvedValue(mockUser);
 
-      const result = await controller.create(createUserDto);
+      const result = await controller.create(createUserDto, { userId: 1 });
 
       expect(result).toEqual(mockUser);
       expect(result.units).toBeDefined();
@@ -156,12 +159,12 @@ describe('UsersController', () => {
         createdAt: new Date(),
       };
 
-      mockUsersService.findById.mockResolvedValue(mockUser);
+      mockUsersService.findOneWithUnits.mockResolvedValue(mockUser);
 
       const result = await controller.findById(1);
 
       expect(result).toEqual(mockUser);
-      expect(mockUsersService.findById).toHaveBeenCalledWith(1);
+      expect(mockUsersService.findOneWithUnits).toHaveBeenCalledWith(1);
     });
 
     it('should return user with associated units', async () => {
@@ -177,7 +180,7 @@ describe('UsersController', () => {
         ],
       };
 
-      mockUsersService.findById.mockResolvedValue(mockUser);
+      mockUsersService.findOneWithUnits.mockResolvedValue(mockUser);
 
       const result = await controller.findById(1);
 
@@ -201,12 +204,12 @@ describe('UsersController', () => {
         createdAt: new Date(),
       };
 
-      mockUsersService.update.mockResolvedValue(mockUpdatedUser);
+      mockUsersService.updateWithUnits.mockResolvedValue(mockUpdatedUser);
 
-      const result = await controller.update(1, updateUserDto);
+      const result = await controller.update('1', updateUserDto, { userId: 1 });
 
       expect(result).toEqual(mockUpdatedUser);
-      expect(mockUsersService.update).toHaveBeenCalledWith(1, updateUserDto);
+      expect(mockUsersService.updateWithUnits).toHaveBeenCalledWith(1, updateUserDto, 1);
     });
 
     it('should update only name field', async () => {
@@ -222,9 +225,9 @@ describe('UsersController', () => {
         createdAt: new Date(),
       };
 
-      mockUsersService.update.mockResolvedValue(mockUpdatedUser);
+      mockUsersService.updateWithUnits.mockResolvedValue(mockUpdatedUser);
 
-      const result = await controller.update(1, updateUserDto);
+      const result = await controller.update('1', updateUserDto, { userId: 1 });
 
       expect(result.name).toBe('Updated Name');
     });

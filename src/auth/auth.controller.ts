@@ -118,6 +118,52 @@ export class AuthController {
     }
   }
 
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Logout user' })
+  @ApiResponse({ status: 200, description: 'Logout successful' })
+  async logout(@Req() req: any) {
+    // Logout logic can be implemented here if needed
+    return { message: 'Logged out successfully' };
+  }
+
+  @Post('refresh-token')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Refresh JWT token' })
+  @ApiResponse({ status: 200, description: 'Token refreshed successfully', type: AuthResponseDto })
+  @ApiResponse({ status: 401, description: 'Invalid refresh token' })
+  async refreshToken(@Body() body: { refresh_token: string }) {
+    try {
+      const result = await this.authService.refreshToken(body.refresh_token);
+      return result;
+    } catch (error) {
+      this.logger.logError({
+        action: 'refresh-token',
+        module: 'auth',
+        timestamp: new Date(),
+      }, error);
+      throw error;
+    }
+  }
+
+  @Post('validate')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Validate JWT token' })
+  @ApiResponse({ status: 200, description: 'Token validation result' })
+  async validateToken(@Body() body: { token: string }) {
+    try {
+      const result = await this.authService.validateToken(body.token);
+      return result;
+    } catch (error) {
+      this.logger.logError({
+        action: 'validate-token',
+        module: 'auth',
+        timestamp: new Date(),
+      }, error);
+      throw error;
+    }
+  }
+
   @Post('select-unit')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Select unit and get new JWT token with unit in payload' })
@@ -175,5 +221,14 @@ export class AuthController {
       );
       throw error;
     }
+  }
+
+  @Post('get-me')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get current user data from token' })
+  @ApiResponse({ status: 200, description: 'User data retrieved successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getMe(@Req() req: any) {
+    return req.user;
   }
 }

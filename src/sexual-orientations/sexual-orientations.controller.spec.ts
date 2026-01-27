@@ -139,10 +139,10 @@ describe('SexualOrientationsController', () => {
         mockSexualOrientation,
       );
 
-      const result = await controller.findOne(1);
+      const result = await controller.findOne('1');
 
       expect(result.description).toBe('Heterossexual');
-      expect(mockSexualOrientationsService.findOne).toHaveBeenCalledWith(1);
+      expect(mockSexualOrientationsService.findOne).toHaveBeenCalledWith('1');
     });
   });
 
@@ -163,11 +163,11 @@ describe('SexualOrientationsController', () => {
         mockUpdatedSexualOrientation,
       );
 
-      const result = await controller.update(1, updateSexualOrientationDto);
+      const result = await controller.update('1', updateSexualOrientationDto);
 
       expect(result.description).toBe('Heterossexual (Atualizado)');
       expect(mockSexualOrientationsService.update).toHaveBeenCalledWith(
-        1,
+        '1',
         updateSexualOrientationDto,
       );
     });
@@ -188,7 +188,7 @@ describe('SexualOrientationsController', () => {
         mockUpdatedSexualOrientation,
       );
 
-      const result = await controller.update(1, updateSexualOrientationDto);
+      const result = await controller.update('1', updateSexualOrientationDto);
 
       expect(result.active).toBe(false);
     });
@@ -198,9 +198,9 @@ describe('SexualOrientationsController', () => {
     it('should delete a sexual orientation', async () => {
       mockSexualOrientationsService.delete.mockResolvedValue(undefined);
 
-      await controller.delete(1);
+      await controller.delete('1');
 
-      expect(mockSexualOrientationsService.delete).toHaveBeenCalledWith(1);
+      expect(mockSexualOrientationsService.delete).toHaveBeenCalledWith('1');
     });
   });
 });

@@ -16,11 +16,14 @@ describe('AuthController', () => {
     refreshToken: jest.fn(),
     validateToken: jest.fn(),
     updateLastLogin: jest.fn(),
+    getUserFromToken: jest.fn(),
+    selectUnit: jest.fn(),
   };
 
   const mockLoggerService = {
     logAuth: jest.fn(),
-    error: jest.fn(),
+    logError: jest.fn(),
+    logAudit: jest.fn(),
   };
 
   beforeEach(async () => {

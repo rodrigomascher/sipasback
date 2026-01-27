@@ -155,6 +155,13 @@ export abstract class BaseService<T, CreateDto, UpdateDto> {
   }
 
   /**
+   * Delete item by ID (alias for remove)
+   */
+  async delete(id: number): Promise<boolean> {
+    return this.remove(id);
+  }
+
+  /**
    * Get total count of items
    */
   async count(): Promise<number> {

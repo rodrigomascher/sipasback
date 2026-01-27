@@ -50,11 +50,12 @@ describe('GenderIdentitiesController', () => {
 
       mockGenderIdentitiesService.create.mockResolvedValue(mockGenderIdentity);
 
-      const result = await controller.create(createGenderIdentityDto);
+      const result = await controller.create(createGenderIdentityDto, { userId: 5 });
 
       expect(result.description).toBe('Cisgênero');
       expect(mockGenderIdentitiesService.create).toHaveBeenCalledWith(
         createGenderIdentityDto,
+        5,
       );
     });
 
@@ -72,7 +73,7 @@ describe('GenderIdentitiesController', () => {
 
       mockGenderIdentitiesService.create.mockResolvedValue(mockGenderIdentity);
 
-      const result = await controller.create(createGenderIdentityDto);
+      const result = await controller.create(createGenderIdentityDto, { userId: 5 });
 
       expect(result.active).toBe(true);
     });
@@ -154,12 +155,13 @@ describe('GenderIdentitiesController', () => {
         mockUpdatedGenderIdentity,
       );
 
-      const result = await controller.update(1, updateGenderIdentityDto);
+      const result = await controller.update('1', updateGenderIdentityDto, { userId: 5 });
 
       expect(result.description).toBe('Cisgênero (Atualizado)');
       expect(mockGenderIdentitiesService.update).toHaveBeenCalledWith(
         1,
         updateGenderIdentityDto,
+        5,
       );
     });
 
@@ -179,7 +181,7 @@ describe('GenderIdentitiesController', () => {
         mockUpdatedGenderIdentity,
       );
 
-      const result = await controller.update(1, updateGenderIdentityDto);
+      const result = await controller.update('1', updateGenderIdentityDto, { userId: 5 });
 
       expect(result.active).toBe(false);
     });
@@ -189,7 +191,7 @@ describe('GenderIdentitiesController', () => {
     it('should delete a gender identity', async () => {
       mockGenderIdentitiesService.delete.mockResolvedValue(undefined);
 
-      await controller.delete(1);
+      await controller.delete('1');
 
       expect(mockGenderIdentitiesService.delete).toHaveBeenCalledWith(1);
     });

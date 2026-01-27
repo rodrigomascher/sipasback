@@ -139,10 +139,10 @@ describe('RelationshipDegreesController', () => {
         mockRelationshipDegree,
       );
 
-      const result = await controller.findOne(1);
+      const result = await controller.findOne('1');
 
       expect(result.description).toBe('Mãe/Mãe social');
-      expect(mockRelationshipDegreesService.findOne).toHaveBeenCalledWith(1);
+      expect(mockRelationshipDegreesService.findOne).toHaveBeenCalledWith('1');
     });
   });
 
@@ -163,11 +163,11 @@ describe('RelationshipDegreesController', () => {
         mockUpdatedRelationshipDegree,
       );
 
-      const result = await controller.update(1, updateRelationshipDegreeDto);
+      const result = await controller.update('1', updateRelationshipDegreeDto);
 
       expect(result.description).toBe('Mãe/Mãe social (Atualizado)');
       expect(mockRelationshipDegreesService.update).toHaveBeenCalledWith(
-        1,
+        '1',
         updateRelationshipDegreeDto,
       );
     });
@@ -188,7 +188,7 @@ describe('RelationshipDegreesController', () => {
         mockUpdatedRelationshipDegree,
       );
 
-      const result = await controller.update(1, updateRelationshipDegreeDto);
+      const result = await controller.update('1', updateRelationshipDegreeDto);
 
       expect(result.active).toBe(false);
     });
@@ -198,9 +198,9 @@ describe('RelationshipDegreesController', () => {
     it('should delete a relationship degree', async () => {
       mockRelationshipDegreesService.delete.mockResolvedValue(undefined);
 
-      await controller.delete(1);
+      await controller.delete('1');
 
-      expect(mockRelationshipDegreesService.delete).toHaveBeenCalledWith(1);
+      expect(mockRelationshipDegreesService.delete).toHaveBeenCalledWith('1');
     });
   });
 });

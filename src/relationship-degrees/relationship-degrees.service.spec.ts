@@ -4,6 +4,7 @@ import { SupabaseService } from '../database/supabase.service';
 import { CreateRelationshipDegreeDto } from './dto/create-relationship-degree.dto';
 import { UpdateRelationshipDegreeDto } from './dto/update-relationship-degree.dto';
 import { ConflictException, NotFoundException } from '@nestjs/common';
+import { PaginationQueryDto } from '../common/dto/paginated-response.dto';
 
 describe('RelationshipDegreesService', () => {
   let service: RelationshipDegreesService;
@@ -103,10 +104,11 @@ describe('RelationshipDegreesService', () => {
 
       mockSupabaseService.selectWithCount.mockResolvedValue(mockResult);
 
-      const result = await service.findAll({ page: 1, pageSize: 10 });
+      const paginationQuery = new PaginationQueryDto({ page: 1, pageSize: 10 });
+      const result = await service.findAll(paginationQuery);
 
       expect(result.data.length).toBe(3);
-      expect(result.totalCount).toBe(3);
+      expect(result.total).toBe(3);
     });
 
     it('should filter by active status', async () => {
@@ -124,7 +126,8 @@ describe('RelationshipDegreesService', () => {
 
       mockSupabaseService.selectWithCount.mockResolvedValue(mockResult);
 
-      const result = await service.findAll({ page: 1, pageSize: 10, active: true });
+      const paginationQuery = new PaginationQueryDto({ page: 1, pageSize: 10 });
+      const result = await service.findAll(paginationQuery);
 
       expect(result.data.length).toBe(1);
       expect(result.data[0].active).toBe(true);
