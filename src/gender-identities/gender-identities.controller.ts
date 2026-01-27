@@ -21,11 +21,6 @@ export class GenderIdentitiesController extends BaseController<
 
   @Get()
   @Public()
-  findAll() {
-    return super.findAll();
-  }
-
-  @Get()
   async findAll(
     @Query('page') page?: string | number,
     @Query('pageSize') pageSize?: string | number,
