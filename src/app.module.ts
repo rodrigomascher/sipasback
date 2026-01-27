@@ -17,6 +17,7 @@ import { FamilyCompositionModule } from './family-composition/family-composition
 import { RacesModule } from './races/races.module';
 import { EthnicitiesModule } from './ethnicities/ethnicities.module';
 import { IncomeTypesModule } from './income-types/income-types.module';
+import { MaritalStatusesModule } from './marital-statuses/marital-statuses.module';
 import { ExampleModule } from './example/example.module';
 import { LoggerModule } from './common/logger/logger.module';
 
@@ -38,6 +39,7 @@ import { LoggerModule } from './common/logger/logger.module';
     RacesModule,
     EthnicitiesModule,
     IncomeTypesModule,
+    MaritalStatusesModule,
     ExampleModule,
     LoggerModule,
   ],
