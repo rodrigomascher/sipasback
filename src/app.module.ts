@@ -20,10 +20,12 @@ import { IncomeTypesModule } from './income-types/income-types.module';
 import { MaritalStatusesModule } from './marital-statuses/marital-statuses.module';
 import { ExampleModule } from './example/example.module';
 import { LoggerModule } from './common/logger/logger.module';
+import { CommonModule } from './common/common.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Module({
   imports: [
+    CommonModule,
     AuthModule,
     UsersModule,
     UserUnitsModule,
