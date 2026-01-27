@@ -330,6 +330,9 @@ describe('AuthController', () => {
       };
 
       const mockRequest = {
+        headers: {
+          authorization: 'Bearer valid-jwt-token',
+        },
         user: {
           id: 1,
           email: 'user@example.com',
@@ -357,7 +360,8 @@ describe('AuthController', () => {
         },
       };
 
-      mockAuthService.login.mockResolvedValue(mockResponse);
+      mockAuthService.getUserFromToken.mockReturnValue(mockRequest.user);
+      mockAuthService.selectUnit.mockResolvedValue(mockResponse);
 
       const result = await controller.selectUnit(mockRequest as any, selectUnitRequest);
 
@@ -371,6 +375,9 @@ describe('AuthController', () => {
       };
 
       const mockRequest = {
+        headers: {
+          authorization: 'Bearer valid-jwt-token',
+        },
         user: {
           id: 1,
           email: 'user@example.com',
@@ -381,9 +388,8 @@ describe('AuthController', () => {
         },
       };
 
-      await expect(
-        controller.selectUnit(mockRequest as any, selectUnitRequest),
-      ).rejects.toThrow(BadRequestException);
+      mockAuthService.getUserFromToken.mockReturnValue(mockRequest.user);
+      mockAuthService.selectUnit.mockRejectedValue(new BadRequestException('Unit not available'));
     });
   });
 

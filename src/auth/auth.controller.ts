@@ -180,7 +180,7 @@ export class AuthController {
     status: 401,
     description: 'Unauthorized',
   })
-  async selectUnit(@Body() selectUnitDto: SelectUnitDto, @Req() req: any) {
+  async selectUnit(@Req() req: any, @Body() selectUnitDto: SelectUnitDto) {
     try {
       // Obter usuário do JWT atual
       const authHeader = req.headers.authorization;
