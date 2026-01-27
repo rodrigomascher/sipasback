@@ -1,5 +1,6 @@
 import { Controller, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Public } from '../decorators/public.decorator';
 import { SeedService } from '../services/seed.service';
 
 @ApiTags('seed')
@@ -7,6 +8,7 @@ import { SeedService } from '../services/seed.service';
 export class SeedController {
   constructor(private seedService: SeedService) {}
 
+  @Public()
   @Post('admin-user')
   @ApiOperation({ summary: 'Create admin user for testing' })
   @ApiResponse({

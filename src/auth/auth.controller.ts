@@ -9,6 +9,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Public } from '../common/decorators/public.decorator';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { SelectUnitDto } from './dto/select-unit.dto';
@@ -23,6 +24,7 @@ export class AuthController {
     private logger: LoggerService,
   ) {}
 
+  @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login and obtain JWT token with session data' })
@@ -69,6 +71,7 @@ export class AuthController {
     }
   }
 
+  @Public()
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register new user' })
@@ -127,6 +130,7 @@ export class AuthController {
     return { message: 'Logged out successfully' };
   }
 
+  @Public()
   @Post('refresh-token')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh JWT token' })
@@ -146,6 +150,7 @@ export class AuthController {
     }
   }
 
+  @Public()
   @Post('validate')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Validate JWT token' })

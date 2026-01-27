@@ -1,6 +1,36 @@
 import { Injectable } from '@nestjs/common';
-import { SupabaseService } from '../database/supabase.service';
+import { SupabaseService } from '../../database/supabase.service';
 import * as bcrypt from 'bcrypt';
+
+interface User {
+  id: number;
+  email: string;
+  name: string;
+  password_hash: string;
+  is_active: boolean;
+}
+
+interface Department {
+  id: number;
+  description: string;
+  created_by?: number;
+}
+
+interface Unit {
+  id: number;
+  name: string;
+  type: string;
+  city: string;
+  state: string;
+  created_by?: number;
+}
+
+interface Role {
+  id: number;
+  name: string;
+  description?: string;
+  created_by?: number;
+}
 
 @Injectable()
 export class SeedService {
@@ -12,7 +42,7 @@ export class SeedService {
       const hashedPassword = await bcrypt.hash('admin123', 10);
 
       // Create admin user
-      const userResult = await this.supabaseService.insert('users', {
+      const userResult = await this.supabaseService.insert<User>('users', {
         email: 'admin@sipas.gov.br',
         name: 'Administrador',
         password_hash: hashedPassword,
@@ -26,30 +56,26 @@ export class SeedService {
       const userId = userResult[0].id;
 
       // Create department
-      const deptResult = await this.supabaseService.insert('departments', {
-        name: 'Administração',
+      const deptResult = await this.supabaseService.insert<Department>('departments', {
         description: 'Departamento de Administração',
-        is_active: true,
         created_by: userId,
       });
 
       // Create unit
-      const unitResult = await this.supabaseService.insert('units', {
+      const unitResult = await this.supabaseService.insert<Unit>('units', {
         name: 'Unidade Central',
         type: 'Sede',
         city: 'Brasília',
         state: 'DF',
-        is_active: true,
         created_by: userId,
       });
 
       const unitId = unitResult[0].id;
 
       // Create role
-      const roleResult = await this.supabaseService.insert('roles', {
+      const roleResult = await this.supabaseService.insert<Role>('roles', {
         name: 'Administrador',
         description: 'Role de administrador do sistema',
-        is_active: true,
         created_by: userId,
       });
 
