@@ -202,7 +202,8 @@ describe('SupabaseService', () => {
 
     it('should return zero count when no matches', async () => {
       const mockQuery = {
-        select: jest.fn().mockResolvedValue({
+        select: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({
           data: [],
           count: 0,
           error: null,
